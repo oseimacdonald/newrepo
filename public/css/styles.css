@@ -1,6 +1,420 @@
-/******* Change Box Model ***************/
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
+/* CSS Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Color Scheme */
+:root {
+    --primary: #1a365d;
+    --primary-light: #2a4a7f;
+    --secondary: #d69e2e;
+    --secondary-light: #ecc94b;
+    --neutral-light: #edf2f7;
+    --neutral-dark: #2d3748;
+    --text: #2d3748;
+    --text-light: #f7fafc;
+}
+
+/* Base Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background-image: url('/images/site/checkerboard.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+#wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(255, 255, 255, 0.92);
+}
+
+/* Header Styles */
+#top-header {
+    background-color: var(--primary);
+    color: var(--text-light);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.siteName a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+#tools a {
+    color: var(--secondary-light);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+#tools a:hover {
+    text-decoration: underline;
+}
+
+/* Navigation Styles */
+nav {
+    background-color: var(--primary-light);
+}
+
+nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    list-style: none;
+}
+
+nav ul li {
+    padding: 0.75rem 0.5rem;
+    color: var(--text-light);
+    font-weight: 500;
+    text-align: center;
+    flex: 1;
+    min-width: 100px;
+}
+
+nav ul li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Main Content Styles */
+main {
+    flex: 1;
+    padding: 1rem;
+}
+
+/* Welcome Section */
+.welcome-section {
+    text-align: center;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+    color: var(--text-light);
+    border-radius: 8px;
+}
+
+.welcome-section h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-section p {
+    font-size: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Featured Vehicle Section */
+.featured-vehicle {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.featured-vehicle h2 {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--secondary);
+}
+
+.vehicle-container {
+    position: relative;
+}
+
+.vehicle-image {
+    position: relative;
+    text-align: center;
+}
+
+.vehicle-image img {
+    width: 100%;
+    max-width: 800px;
+    border-radius: 8px;
+    display: block;
+}
+
+/* Transparent overlay for vehicle details */
+.vehicle-details-overlay {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 1rem;
+    border-radius: 6px;
+    max-width: 280px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.vehicle-details-overlay h3 {
+    color: var(--primary);
+    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--secondary);
+    padding-bottom: 0.3rem;
+}
+
+.specs {
+    list-style: none;
+    margin-bottom: 1.5rem;
+}
+
+.specs li {
+    padding: 0.3rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 0.8rem;
+    line-height: 1.3;
+}
+
+.specs li:last-child {
+    border-bottom: none;
+}
+
+.specs strong {
+    color: var(--primary-light);
+}
+
+/* Own Today Button Styles */
+.own-today-btn {
+    display: inline-block;
+}
+
+.own-today-btn img {
+    max-width: 100px;
+    height: auto;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.own-today-btn:hover img {
+    transform: scale(1.03);
+}
+
+/* Upgrades and Reviews Section */
+.details-reviews {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.upgrades, .reviews {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.upgrades h2, .reviews h2 {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--secondary);
+    font-size: 1.5rem;
+}
+
+.upgrade-item {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.upgrade-item:last-child {
+    border-bottom: none;
+}
+
+.upgrade-image {
+    width: 100%;
+    height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.upgrade-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upgrade-content h3 {
+    color: var(--primary-light);
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.price {
+    color: var(--secondary);
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+}
+
+.review-item {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.review-content h3 {
+    color: var(--primary-light);
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.review-meta {
+    font-size: 0.9rem;
+    color: #718096;
+    margin-bottom: 0.75rem;
+}
+
+.rating {
+    color: var(--secondary);
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+}
+
+/* Footer Styles */
+footer {
+    background-color: var(--primary);
+    color: var(--text-light);
+    text-align: center;
+    padding: 1.25rem;
+    margin-top: auto;
+}
+
+.copyright {
+    font-size: 0.9rem;
+}
+
+/* Media Queries for Larger Screens */
+@media screen and (min-width: 768px) {
+    #top-header {
+        padding: 1rem 2rem;
+    }
+    
+    nav ul li {
+        padding: 0.75rem 1rem;
+        min-width: auto;
+    }
+    
+    main {
+        padding: 2rem;
+    }
+    
+    .welcome-section {
+        padding: 2rem;
+    }
+    
+    .welcome-section h1 {
+        font-size: 2.2rem;
+    }
+    
+    .featured-vehicle {
+        padding: 2rem;
+    }
+    
+    .vehicle-details-overlay {
+        top: 10px;
+        left: 40px;
+        max-width: 200px;
+        padding: 0.5rem;
+    }
+    
+    .vehicle-details-overlay h3 {
+        font-size: 1.8rem;
+    }
+    
+    .own-today-btn img {
+        max-width: 220px;
+    }
+    
+    .details-reviews {
+        flex-direction: row;
+    }
+    
+    .upgrades {
+        flex: 1;
+    }
+    
+    .reviews {
+        flex: 1;
+    }
+    
+    .upgrade-item {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    
+    .upgrade-image {
+        width: 120px;
+        height: 120px;
+        flex-shrink: 0;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    nav ul {
+        flex-wrap: nowrap;
+    }
+    
+    .welcome-section {
+        padding: 2.5rem;
+    }
+    
+    .welcome-section h1 {
+        font-size: 2.5rem;
+    }
+    
+    .vehicle-details-overlay {
+        top: 60px;
+        left: 60px;
+        max-width: 450px;
+    }
+    
+    .own-today-btn img {
+        max-width: 250px;
+    }
+    
+    .upgrade-image {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+/* Mobile-specific adjustments */
+@media screen and (max-width: 767px) {
+    .vehicle-details-overlay {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-top: 1rem;
+        max-width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .vehicle-image img {
+        width: 100%;
+    }
 }
