@@ -9,12 +9,13 @@
 :root {
     --primary: #1a365d;
     --primary-light: #2a4a7f;
-    --secondary: #d69e2e;
-    --secondary-light: #ecc94b;
+    --secondary: #b37c1d;
+    --secondary-light: #c89122;
     --neutral-light: #edf2f7;
     --neutral-dark: #2d3748;
     --text: #2d3748;
     --text-light: #f7fafc;
+    --text-meta: #4a5568
 }
 
 /* Base Styles */
@@ -153,7 +154,7 @@ main {
     position: absolute;
     top: 15px;
     left: 15px;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.95);
     padding: 1rem;
     border-radius: 6px;
     max-width: 280px;
@@ -285,7 +286,7 @@ main {
 
 .review-meta {
     font-size: 0.9rem;
-    color: #718096;
+    color: var(--text-meta);
     margin-bottom: 0.75rem;
 }
 
@@ -417,4 +418,33 @@ footer {
     .vehicle-image img {
         width: 100%;
     }
+
+/* SEO and Accessibility Improvement */
+.vehicle-image img {
+  width: 100%;
+  height: auto;
+}
+
+/* add focus style for accessibility */
+a:focus, button:focus {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+/* add skip links for accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--primary);
+  color: white;
+  padding: 8px;
+  z-index: 100;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 }
