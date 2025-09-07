@@ -5,7 +5,7 @@
     box-sizing: border-box;
 }
 
-/* Color Scheme */
+/* Color Scheme - Improved contrast */
 :root {
     --primary: #1a365d;
     --primary-light: #2a4a7f;
@@ -15,7 +15,7 @@
     --neutral-dark: #2d3748;
     --text: #2d3748;
     --text-light: #f7fafc;
-    --text-meta: #4a5568
+    --text-meta: #4a5568;
 }
 
 /* Base Styles */
@@ -23,17 +23,25 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: var(--text);
-    background-image: url('/images/site/checkerboard.jpg');
+    background-image: url('/images/site/small_check.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-}
-
-#wrapper {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: rgba(255, 255, 255, 0.92);
+}
+
+/* Main content container with solid background */
+.content-container {
+    background-color: white;
+    width: 95%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    flex: 1;
 }
 
 /* Header Styles */
@@ -90,56 +98,58 @@ nav ul li:hover {
 
 /* Main Content Styles */
 main {
-    flex: 1;
-    padding: 1rem;
+    padding: 1.5rem;
 }
 
 /* Welcome Section */
 .welcome-section {
     text-align: center;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
     background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
     color: var(--text-light);
     border-radius: 8px;
 }
 
 .welcome-section h1 {
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
 }
 
 .welcome-section p {
-    font-size: 1rem;
+    font-size: 1.1rem;
     max-width: 600px;
     margin: 0 auto;
 }
 
 /* Featured Vehicle Section */
 .featured-vehicle {
-    background-color: white;
     padding: 1.5rem;
+    margin-bottom: 2rem;
     border-radius: 8px;
-    margin-bottom: 1.5rem;
+    background-color: var(--neutral-light);
     position: relative;
+    min-height: 500px; /* Ensure enough space for overlay */
 }
 
 .featured-vehicle h2 {
     color: var(--primary);
     margin-bottom: 1.5rem;
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     padding-bottom: 0.5rem;
     border-bottom: 2px solid var(--secondary);
 }
 
 .vehicle-container {
     position: relative;
+    height: 100%;
 }
 
 .vehicle-image {
     position: relative;
     text-align: center;
+    height: 100%;
 }
 
 .vehicle-image img {
@@ -147,40 +157,40 @@ main {
     max-width: 800px;
     border-radius: 8px;
     display: block;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Transparent overlay for vehicle details */
 .vehicle-details-overlay {
     position: absolute;
-    top: 15px;
-    left: 15px;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 1rem;
-    border-radius: 6px;
-    max-width: 280px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(5px);
+    top: 5px;                  /* Increased top margin for more space */
+    left: 10px;                 /* Moved closer to the corner */
+    background: rgba(255, 255, 255, 0.75); /* Slightly more transparent */
+    padding: 0.6rem;            /* Smaller padding */
+    border-radius: 6px;         /* Slightly less rounded */
+    max-width: 160px;           /* Narrower box */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Softer shadow */
     border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px); /* Slightly lighter blur */
 }
 
 .vehicle-details-overlay h3 {
     color: var(--primary);
-    margin-bottom: 0.8rem;
-    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;         /* Smaller heading */
     border-bottom: 1px solid var(--secondary);
-    padding-bottom: 0.3rem;
+    padding-bottom: 0.2rem;
 }
 
 .specs {
     list-style: none;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .specs li {
-    padding: 0.3rem 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    font-size: 0.8rem;
-    line-height: 1.3;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 0.85rem;
+    line-height: 1.4;
 }
 
 .specs li:last-child {
@@ -188,37 +198,44 @@ main {
 }
 
 .specs strong {
-    color: var(--primary-light);
+    color: var(--primary);
+    font-size: 0.9rem;
 }
 
-/* Own Today Button Styles */
+.buy-now {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+/* Own Today Button */
 .own-today-btn {
     display: inline-block;
 }
 
 .own-today-btn img {
-    max-width: 100px;
+    max-width: 160px;
     height: auto;
-    border-radius: 8px;
+    border-radius: 6px;
     transition: all 0.3s ease;
 }
 
 .own-today-btn:hover img {
-    transform: scale(1.03);
+    transform: scale(1.04);
 }
 
 /* Upgrades and Reviews Section */
 .details-reviews {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
 .upgrades, .reviews {
     background: white;
     padding: 1.5rem;
     border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
 .upgrades h2, .reviews h2 {
@@ -244,7 +261,7 @@ main {
 
 .upgrade-image {
     width: 100%;
-    height: 150px;
+    height: 160px;
     border-radius: 8px;
     overflow: hidden;
 }
@@ -256,15 +273,15 @@ main {
 }
 
 .upgrade-content h3 {
-    color: var(--primary-light);
+    color: var(--primary);
     margin-bottom: 0.5rem;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
 }
 
 .price {
-    color: var(--secondary);
+    color: var(--primary-light);
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     margin-top: 0.5rem;
 }
 
@@ -279,20 +296,20 @@ main {
 }
 
 .review-content h3 {
-    color: var(--primary-light);
+    color: var(--primary);
     margin-bottom: 0.5rem;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 .review-meta {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-meta);
     margin-bottom: 0.75rem;
 }
 
 .rating {
     color: var(--secondary);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     margin-top: 0.5rem;
 }
 
@@ -301,8 +318,7 @@ footer {
     background-color: var(--primary);
     color: var(--text-light);
     text-align: center;
-    padding: 1.25rem;
-    margin-top: auto;
+    padding: 1.5rem;
 }
 
 .copyright {
@@ -311,13 +327,17 @@ footer {
 
 /* Media Queries for Larger Screens */
 @media screen and (min-width: 768px) {
+    .content-container {
+        width: 90%;
+        margin: 2.5rem auto;
+    }
+    
     #top-header {
-        padding: 1rem 2rem;
+        padding: 1.2rem 2rem;
     }
     
     nav ul li {
-        padding: 0.75rem 1rem;
-        min-width: auto;
+        padding: 0.85rem 1rem;
     }
     
     main {
@@ -325,30 +345,30 @@ footer {
     }
     
     .welcome-section {
-        padding: 2rem;
+        padding: 2.5rem;
     }
     
     .welcome-section h1 {
-        font-size: 2.2rem;
+        font-size: 2.4rem;
     }
     
-    .featured-vehicle {
+    .featured-vehicle, .upgrades, .reviews {
         padding: 2rem;
     }
     
     .vehicle-details-overlay {
-        top: 10px;
-        left: 40px;
-        max-width: 200px;
-        padding: 0.5rem;
+        top: 30px;
+        left: 30px;
+        max-width: 340px;
+        padding: 1.5rem;
     }
     
     .vehicle-details-overlay h3 {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
     }
     
     .own-today-btn img {
-        max-width: 220px;
+        max-width: 180px;
     }
     
     .details-reviews {
@@ -376,75 +396,93 @@ footer {
 }
 
 @media screen and (min-width: 1024px) {
+    .content-container {
+        width: 85%;
+        max-width: 1300px;
+    }
+    
     nav ul {
         flex-wrap: nowrap;
     }
     
     .welcome-section {
-        padding: 2.5rem;
+        padding: 3rem;
     }
     
     .welcome-section h1 {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
     }
     
     .vehicle-details-overlay {
-        top: 60px;
-        left: 60px;
-        max-width: 450px;
+        top: 40px;
+        left: 40px;
+        max-width: 380px;
     }
     
     .own-today-btn img {
-        max-width: 250px;
+        max-width: 200px;
     }
     
     .upgrade-image {
-        width: 150px;
-        height: 150px;
+        width: 140px;
+        height: 140px;
     }
 }
 
 /* Mobile-specific adjustments */
 @media screen and (max-width: 767px) {
+    .content-container {
+        width: 92%;
+        margin: 1rem auto;
+        border-radius: 8px;
+    }
+    
     .vehicle-details-overlay {
         position: relative;
         top: 0;
         left: 0;
-        margin-top: 1rem;
+        margin: 1.5rem auto 0;
         max-width: 100%;
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.95); /* More opaque on mobile for better readability */
     }
     
     .vehicle-image img {
         width: 100%;
     }
+    
+    .own-today-btn img {
+        max-width: 180px;
+    }
+    
+    .featured-vehicle {
+        min-height: auto; /* Remove fixed height on mobile */
+    }
+}
 
-/* SEO and Accessibility Improvement */
+/* SEO and Accessibility Improvements */
 .vehicle-image img {
-  width: 100%;
-  height: auto;
+    width: 100%;
+    height: auto;
 }
 
-/* add focus style for accessibility */
+/* Add focus styles for accessibility */
 a:focus, button:focus {
-  outline: 2px solid var(--secondary);
-  outline-offset: 2px;
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
 }
 
-/* add skip links for accessibility */
+/* Add skip link for accessibility */
 .skip-link {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  background: var(--primary);
-  color: white;
-  padding: 8px;
-  z-index: 100;
-  transition: top 0.3s;
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--primary);
+    color: white;
+    padding: 8px;
+    z-index: 100;
+    transition: top 0.3s;
 }
 
 .skip-link:focus {
-  top: 0;
-}
-
+    top: 0;
 }

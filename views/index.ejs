@@ -1,99 +1,118 @@
-<!-- Welcome Section -->
-<section class="welcome-section">
-    <h1>Welcome to CSE Motors</h1>
-    <p>Your premier destination for quality vehicles and exceptional service.</p>
-</section>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head', {title: 'CSE Motors | Luxury Vehicles & Custom Upgrades'}) %>
+</head>
 
-<!-- Featured Vehicle Section -->
-<section class="featured-vehicle">
-    <h2>Featured Vehicle</h2>
-    <div class="vehicle-container">
-        <div class="vehicle-image">
-            <img src="/images/vehicles/delorean.jpg" alt="Delorean DMC-12">
-            <div class="vehicle-details-overlay">
-                <h3>Delorean DMC-12</h3>
-                <ul class="specs">
-                    <li><strong>Engine:</strong> 2.85L V6</li>
-                    <li><strong>Horsepower:</strong> 130 HP</li>
-                    <li><strong>Torque:</strong> 153 lb-ft</li>
-                    <li><strong>Top Speed:</strong> 109 mph</li>
-                    <li><strong>MPG:</strong> 16 city / 22 highway</li>
-                    <li><strong>Transmission:</strong> 5-speed manual</li>
-                    <li><strong>Drivetrain:</strong> Rear-wheel drive</li>
-                    <li><strong>Special Feature:</strong> Stainless steel body</li>
-                </ul>
-                <div class="buy-now">
-                    <a href="#" class="own-today-btn">
-                        <img src="/images/site/own_today.png" alt="Own Today">
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Delorean Upgrades and Reviews -->
-<section class="details-reviews">
-    <div class="upgrades">
-        <h2>Delorean Upgrades</h2>
-        <div class="upgrade-item">
-            <div class="upgrade-image">
-                <img src="/images/upgrades/flux-cap.jpg" alt="Flux Capacitor Upgrade">
-            </div>
-            <div class="upgrade-content">
-                <h3>Flux Capacitor</h3>
-                <p>Travel through time with our premium flux capacitor installation. Requires 1.21 gigawatts of power (not included).</p>
-                <p class="price">$12,100</p>
-            </div>
-        </div>
-        <div class="upgrade-item">
-            <div class="upgrade-image">
-                <img src="/images/upgrades/hub-cap.jpg" alt="Custom Hub Caps">
-            </div>
-            <div class="upgrade-content">
-                <h3>Stainless Steel Hub Caps</h3>
-                <p>Upgrade your wheels with our premium stainless steel hub caps. Specially designed to match the Delorean's iconic look.</p>
-                <p class="price">$850</p>
-            </div>
-        </div>
-        <div class="upgrade-item">
-            <div class="upgrade-image">
-                <img src="/images/upgrades/bumper_sticker.jpg" alt="Custom Bumper Stickers">
-            </div>
-            <div class="upgrade-content">
-                <h3>Time Traveler Package</h3>
-                <p>Express your time traveling adventures with our special edition bumper stickers and decals.</p>
-                <p class="price">$120</p>
-            </div>
-        </div>
-    </div>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     
-    <div class="reviews">
-        <h2>Delorean Reviews</h2>
-        <div class="review-item">
-            <div class="review-content">
-                <h3>Great Scott! This car is amazing!</h3>
-                <div class="review-meta">By Emmett B. · October 26, 1985</div>
-                <p>This car exceeds all my expectations. The stainless steel body is not only beautiful but also resistant to corrosion. The gull-wing doors are a conversation starter everywhere I go.</p>
-                <div class="rating">★★★★★</div>
-            </div>
-        </div>
-        <div class="review-item">
-            <div class="review-content">
-                <h3>Perfect for time travel</h3>
-                <div class="review-meta">By Marty M. · November 5, 1985</div>
-                <p>I've put my Delorean through some serious temporal displacements and it handles like a dream. The flux capacitor integration was seamless and the technicians at CSE Motors really know their stuff.</p>
-                <div class="rating">★★★★☆</div>
-            </div>
-        </div>
-        <div class="review-item">
-            <div class="review-content">
-                <h3>Head-turning classic</h3>
-                <div class="review-meta">By Jennifer P. · December 12, 1985</div>
-                <p>I get compliments everywhere I go. The unique design and stainless steel finish make this car stand out from everything else on the road. The team at CSE Motors provided excellent service throughout the purchase process.</p>
-                <div class="rating">★★★★★</div>
-            </div>
-        </div>
-    </div>
-</section>
+    <div class="content-container">
+        <%- include('partials/header') %>
+        <%- include('partials/navigation') %>
+        
+        <main id="main-content">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <h1>Welcome to CSE Motors</h1>
+                <p>Your premier destination for quality vehicles and exceptional service.</p>
+            </section>
+            
+            <!-- Featured Vehicle Section -->
+            <section class="featured-vehicle">
+                <h2>Featured Vehicle</h2>
+                <div class="vehicle-container">
+                    <div class="vehicle-image">
+                        <img src="/images/vehicles/delorean.jpg" alt="Delorean DMC-12 luxury sports car with stainless steel body and gull-wing doors" width="800" height="450">
+                        <div class="vehicle-details-overlay">
+                            <h3>Delorean DMC-12</h3>
+                            <ul class="specs">
+                                <li><strong>Engine:</strong> 2.85L V6</li>
+                                <li><strong>Horsepower:</strong> 130 HP</li>
+                                <li><strong>Torque:</strong> 153 lb-ft</li>
+                                <li><strong>Top Speed:</strong> 109 mph</li>
+                                <li><strong>MPG:</strong> 16 city / 22 highway</li>
+                                <li><strong>Transmission:</strong> 5-speed manual</li>
+                                <li><strong>Drivetrain:</strong> Rear-wheel drive</li>
+                                <li><strong>Special Feature:</strong> Stainless steel body</li>
+                            </ul>
+                            <div class="buy-now">
+                                <a href="#" class="own-today-btn">
+                                    <img src="/images/site/own_today.png" alt="Own Today - Purchase your Delorean now" width="200" height="60">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
+            <!-- Delorean Upgrades and Reviews -->
+            <section class="details-reviews">
+                <div class="upgrades">
+                    <h2>Delorean Upgrades</h2>
+                    <div class="upgrade-item">
+                        <div class="upgrade-image">
+                            <img src="/images/upgrades/flux-cap.jpg" alt="Flux Capacitor upgrade for time travel capabilities" width="300" height="200">
+                        </div>
+                        <div class="upgrade-content">
+                            <h3>Flux Capacitor</h3>
+                            <p>Travel through time with our premium flux capacitor installation. Requires 1.21 gigawatts of power (not included).</p>
+                            <p class="price">$12,100</p>
+                        </div>
+                    </div>
+                    <div class="upgrade-item">
+                        <div class="upgrade-image">
+                            <img src="/images/upgrades/hub-cap.jpg" alt="Stainless steel hub caps for Delorean wheels" width="300" height="200">
+                        </div>
+                        <div class="upgrade-content">
+                            <h3>Stainless Steel Hub Caps</h3>
+                            <p>Upgrade your wheels with our premium stainless steel hub caps. Specially designed to match the Delorean's iconic look.</p>
+                            <p class="price">$850</p>
+                        </div>
+                    </div>
+                    <div class="upgrade-item">
+                        <div class="upgrade-image">
+                            <img src="/images/upgrades/bumper_sticker.jpg" alt="Time traveler package with custom bumper stickers" width="300" height="200">
+                        </div>
+                        <div class="upgrade-content">
+                            <h3>Time Traveler Package</h3>
+                            <p>Express your time traveling adventures with our special edition bumper stickers and decals.</p>
+                            <p class="price">$120</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="reviews">
+                    <h2>Delorean Reviews</h2>
+                    <div class="review-item">
+                        <div class="review-content">
+                            <h3>Great Scott! This car is amazing!</h3>
+                            <div class="review-meta">By Emmett B. · October 26, 1985</div>
+                            <p>This car exceeds all my expectations. The stainless steel body is not only beautiful but also resistant to corrosion. The gull-wing doors are a conversation starter everywhere I go.</p>
+                            <div class="rating" aria-label="5 out of 5 stars">★★★★★</div>
+                        </div>
+                    </div>
+                    <div class="review-item">
+                        <div class="review-content">
+                            <h3>Perfect for time travel</h3>
+                            <div class="review-meta">By Marty M. · November 5, 1985</div>
+                            <p>I've put my Delorean through some serious temporal displacements and it handles like a dream. The flux capacitor integration was seamless and the technicians at CSE Motors really know their stuff.</p>
+                            <div class="rating" aria-label="4 out of 5 stars">★★★★☆</div>
+                        </div>
+                    </div>
+                    <div class="review-item">
+                        <div class="review-content">
+                            <h3>Head-turning classic</h3>
+                            <div class="review-meta">By Jennifer P. · December 12, 1985</div>
+                            <p>I get compliments everywhere I go. The unique design and stainless steel finish make this car stand out from everything else on the road. The team at CSE Motors provided excellent service throughout the purchase process.</p>
+                            <div class="rating" aria-label="5 out of 5 stars">★★★★★</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <%- include('partials/footer') %>
+    </div>
+</body>
+</html>
