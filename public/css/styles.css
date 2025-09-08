@@ -9,12 +9,12 @@
 :root {
     --primary: #1a365d;
     --primary-light: #2a4a7f;
-    --secondary: #0540ff;
+    --secondary: #0f0f28;
     --secondary-light: #ccff9d;
     --neutral-light: #edf2f7;
     --neutral-dark: #2d3748;
     --text: #2d3748;
-    --text-light: #f7fafc;
+    --text-light: #f7fafc; 
     --text-meta: #4a5568;
 }
 
@@ -311,6 +311,26 @@ main {
     color: var(--secondary);
     font-size: 1.1rem;
     margin-top: 0.5rem;
+    unicode-bidi: bidi-override;
+    direction: rtl;
+}
+
+.rating span {
+  display: inline-block;
+  position: relative;
+  width: 0.8em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Footer Styles */
