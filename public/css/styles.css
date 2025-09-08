@@ -160,8 +160,9 @@ main {
 }
 
 .vehicle-image img {
-    width: auto;
-    max-width: auto;
+    width: 100%;
+    height: auto;
+    max-width: 800px;
     border-radius: 8px;
     display: block;
     margin: 0 auto;
