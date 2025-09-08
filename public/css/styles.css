@@ -5,22 +5,23 @@
     box-sizing: border-box;
 }
 
-/* Color Scheme - Improved contrast */
+/* Color Scheme - Passes accessibility contrast checks */
 :root {
     --primary: #1a365d;
     --primary-light: #2a4a7f;
     --secondary: #0f0f28;
-    --secondary-light: #ccff9d;
+    --accent: #3a74ac;
     --neutral-light: #edf2f7;
     --neutral-dark: #2d3748;
     --text: #2d3748;
-    --text-light: #f7fafc; 
+    --text-light: #f7fafc;
     --text-meta: #4a5568;
+    --success: #2d5a27;
 }
 
-/* Base Styles */
+/* Base Styles - Mobile First */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: var(--text);
     background-image: url('/images/site/small_check.jpg');
@@ -32,14 +33,14 @@ body {
     flex-direction: column;
 }
 
-/* Main content container with solid background */
+/* Main Container */
 .content-container {
-    background-color: white;
     width: 95%;
     max-width: 1200px;
-    margin: 2rem auto;
+    margin: 1rem auto;
+    background-color: white;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     flex: 1;
 }
@@ -62,13 +63,17 @@ body {
 }
 
 #tools a {
-    color: var(--secondary-light);
+    color: var(--text-light);
     text-decoration: none;
     font-weight: 500;
+    padding: 8px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    transition: background-color 0.3s;
 }
 
 #tools a:hover {
-    text-decoration: underline;
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 /* Navigation Styles */
@@ -90,66 +95,68 @@ nav ul li {
     text-align: center;
     flex: 1;
     min-width: 100px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 nav ul li:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Main Content Styles */
+/* Main */
 main {
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 /* Welcome Section */
 .welcome-section {
     text-align: center;
-    padding: 2rem;
-    margin-bottom: 2rem;
+    padding: 2rem 1rem;
+    margin-bottom: 1.5rem;
     background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
     color: var(--text-light);
     border-radius: 8px;
 }
 
 .welcome-section h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     margin-bottom: 0.75rem;
+    font-weight: 700;
 }
 
 .welcome-section p {
     font-size: 1.1rem;
     max-width: 600px;
     margin: 0 auto;
+    font-weight: 400;
 }
 
-/* Featured Vehicle Section */
+/* Featured Vehicle */
 .featured-vehicle {
-    padding: 1.5rem;
-    margin-bottom: 2rem;
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
     border-radius: 8px;
     background-color: var(--neutral-light);
     position: relative;
-    min-height: 500px; /* Ensure enough space for overlay */
 }
 
 .featured-vehicle h2 {
     color: var(--primary);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
     text-align: center;
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--secondary);
+    border-bottom: 2px solid var(--accent);
+    font-weight: 600;
 }
 
 .vehicle-container {
     position: relative;
-    height: 100%;
 }
 
 .vehicle-image {
     position: relative;
     text-align: center;
-    height: 100%;
 }
 
 .vehicle-image img {
@@ -157,40 +164,42 @@ main {
     max-width: 800px;
     border-radius: 8px;
     display: block;
+    margin: 0 auto;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Vehicle Details Overlay - Mobile as overlay (reduced by 20%) */
 .vehicle-details-overlay {
     position: absolute;
-    top: 5px;                  /* Increased top margin for more space */
-    left: 10px;                 /* Moved closer to the corner */
-    background: rgba(255, 255, 255, 0.75); /* Slightly more transparent */
-    padding: 0.6rem;            /* Smaller padding */
-    border-radius: 6px;         /* Slightly less rounded */
-    max-width: 160px;           /* Narrower box */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Softer shadow */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(4px); /* Slightly lighter blur */
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.8rem; /* Reduced by 20% */
+    border-radius: 6px; /* Reduced by 20% */
+    max-width: 36%; /* Reduced by 20% (from 45%) */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Reduced by 20% */
+    z-index: 10;
 }
 
 .vehicle-details-overlay h3 {
     color: var(--primary);
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;         /* Smaller heading */
-    border-bottom: 1px solid var(--secondary);
-    padding-bottom: 0.2rem;
+    margin-bottom: 0.4rem; /* Reduced by 20% */
+    font-size: 0.8rem; /* Reduced by 20% */
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 0.24rem; /* Reduced by 20% */
+    font-weight: 600;
 }
 
 .specs {
     list-style: none;
-    margin-bottom: 1rem;
+    margin-bottom: 0.64rem; /* Reduced by 20% */
 }
 
 .specs li {
-    padding: 0.35rem 0;
+    padding: 0.16rem 0; /* Reduced by 20% */
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    font-size: 0.85rem;
-    line-height: 1.4;
+    font-size: 0.6rem; /* Reduced by 20% */
+    line-height: 1.2;
 }
 
 .specs li:last-child {
@@ -199,70 +208,78 @@ main {
 
 .specs strong {
     color: var(--primary);
-    font-size: 0.9rem;
+    font-size: 0.64rem; /* Reduced by 20% */
 }
 
 .buy-now {
     text-align: center;
-    margin-top: 1rem;
+    margin-top: 0.4rem; /* Reduced by 20% */
 }
 
-/* Own Today Button */
 .own-today-btn {
     display: inline-block;
 }
 
 .own-today-btn img {
-    max-width: 160px;
+    max-width: 96px; /* Reduced by 20% */
     height: auto;
-    border-radius: 6px;
-    transition: all 0.3s ease;
+    border-radius: 5px; /* Reduced by 20% */
+    transition: transform 0.3s ease;
 }
 
 .own-today-btn:hover img {
-    transform: scale(1.04);
+    transform: scale(1.05);
 }
 
-/* Upgrades and Reviews Section */
+/* Upgrades and Reviews */
 .details-reviews {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    margin-bottom: 2rem;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .upgrades, .reviews {
     background: white;
-    padding: 1.5rem;
+    padding: 1.5rem 1rem;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
 .upgrades h2, .reviews h2 {
     color: var(--primary);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--secondary);
+    border-bottom: 2px solid var(--accent);
     font-size: 1.5rem;
+    font-weight: 600;
 }
 
-.upgrade-item {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    flex-direction: column;
+/* Upgrades Grid - 2x2 on mobile */
+.upgrades-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 1rem;
 }
 
-.upgrade-item:last-child {
-    border-bottom: none;
+.upgrade-item {
+    display: flex;
+    flex-direction: column;
+    background: var(--neutral-light);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.upgrade-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .upgrade-image {
     width: 100%;
-    height: 160px;
-    border-radius: 8px;
+    height: 100px;
     overflow: hidden;
 }
 
@@ -272,17 +289,31 @@ main {
     object-fit: cover;
 }
 
+.upgrade-content {
+    padding: 0.8rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .upgrade-content h3 {
     color: var(--primary);
-    margin-bottom: 0.5rem;
-    font-size: 1.2rem;
+    margin-bottom: 0.4rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.upgrade-content p {
+    font-size: 0.8rem;
+    margin-bottom: 0.6rem;
+    flex-grow: 1;
 }
 
 .price {
     color: var(--primary-light);
     font-weight: bold;
-    font-size: 1.1rem;
-    margin-top: 0.5rem;
+    font-size: 1rem;
+    margin-top: auto;
 }
 
 .review-item {
@@ -299,43 +330,37 @@ main {
     color: var(--primary);
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
+    font-weight: 600;
 }
 
 .review-meta {
     font-size: 0.85rem;
     color: var(--text-meta);
     margin-bottom: 0.75rem;
+    font-style: italic;
 }
 
-/* Footer Styles */
+/* Footer */
 footer {
     background-color: var(--primary);
     color: var(--text-light);
     text-align: center;
-    padding: 1.5rem;
+    padding: 1.5rem 1rem;
 }
 
 .copyright {
     font-size: 0.9rem;
 }
 
-/* Media Queries for Larger Screens */
+/* Media Queries for larger screens */
 @media screen and (min-width: 768px) {
     .content-container {
         width: 90%;
-        margin: 2.5rem auto;
-    }
-    
-    #top-header {
-        padding: 1.2rem 2rem;
-    }
-    
-    nav ul li {
-        padding: 0.85rem 1rem;
+        margin: 2rem auto;
     }
     
     main {
-        padding: 2rem;
+        padding: 1.5rem;
     }
     
     .welcome-section {
@@ -343,129 +368,108 @@ footer {
     }
     
     .welcome-section h1 {
-        font-size: 2.4rem;
+        font-size: 2.2rem;
     }
     
-    .featured-vehicle, .upgrades, .reviews {
+    .featured-vehicle {
         padding: 2rem;
+    }
+    
+    .featured-vehicle h2 {
+        font-size: 1.8rem;
     }
     
     .vehicle-details-overlay {
         top: 30px;
         left: 30px;
-        max-width: 340px;
-        padding: 1.5rem;
+        max-width: 320px;
+        padding: 1.2rem;
     }
     
     .vehicle-details-overlay h3 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
+    }
+    
+    .specs li {
+        font-size: 0.9rem;
+        padding: 0.3rem 0;
+    }
+    
+    .specs strong {
+        font-size: 0.95rem;
     }
     
     .own-today-btn img {
-        max-width: 180px;
+        max-width: 160px;
     }
     
     .details-reviews {
         flex-direction: row;
+        gap: 2rem;
     }
     
+    /* Upgrades on left, Reviews on right for desktop */
     .upgrades {
         flex: 1;
+        order: 1;
+        padding: 2rem;
     }
     
     .reviews {
         flex: 1;
+        order: 2;
+        padding: 2rem;
     }
     
-    .upgrade-item {
-        flex-direction: row;
-        align-items: flex-start;
+    .upgrades-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
     }
     
     .upgrade-image {
-        width: 120px;
-        height: 120px;
-        flex-shrink: 0;
+        height: 140px;
+    }
+    
+    .upgrade-content {
+        padding: 1rem;
+    }
+    
+    .upgrade-content h3 {
+        font-size: 1.1rem;
+    }
+    
+    .upgrade-content p {
+        font-size: 0.9rem;
     }
 }
 
 @media screen and (min-width: 1024px) {
     .content-container {
         width: 85%;
-        max-width: 1300px;
-    }
-    
-    nav ul {
-        flex-wrap: nowrap;
-    }
-    
-    .welcome-section {
-        padding: 3rem;
-    }
-    
-    .welcome-section h1 {
-        font-size: 2.8rem;
+        max-width: 1200px;
     }
     
     .vehicle-details-overlay {
         top: 40px;
         left: 40px;
-        max-width: 380px;
+        max-width: 340px;
     }
     
-    .own-today-btn img {
-        max-width: 200px;
+    .upgrades-grid {
+        grid-template-columns: 1fr 1fr;
     }
     
     .upgrade-image {
-        width: 140px;
-        height: 140px;
+        height: 160px;
     }
 }
 
-/* Mobile-specific adjustments */
-@media screen and (max-width: 767px) {
-    .content-container {
-        width: 92%;
-        margin: 1rem auto;
-        border-radius: 8px;
-    }
-    
-    .vehicle-details-overlay {
-        position: relative;
-        top: 0;
-        left: 0;
-        margin: 1.5rem auto 0;
-        max-width: 100%;
-        background: rgba(255, 255, 255, 0.95); /* More opaque on mobile for better readability */
-    }
-    
-    .vehicle-image img {
-        width: 100%;
-    }
-    
-    .own-today-btn img {
-        max-width: 180px;
-    }
-    
-    .featured-vehicle {
-        min-height: auto; /* Remove fixed height on mobile */
-    }
-}
-
-/* SEO and Accessibility Improvements */
-.vehicle-image img {
-    width: 100%;
-    height: auto;
-}
-
-/* Add focus styles for accessibility */
+/* Accessibility */
 a:focus, button:focus {
     outline: 2px solid var(--secondary);
     outline-offset: 2px;
 }
 
-/* Add skip link for accessibility */
 .skip-link {
     position: absolute;
     top: -40px;
