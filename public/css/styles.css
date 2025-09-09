@@ -24,7 +24,7 @@ body {
     font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: var(--text);
-    background-image: url('/images/site/small_check.jpg');
+    background-image: none;
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -355,6 +355,18 @@ footer {
 
 /* Media Queries for larger screens */
 @media screen and (min-width: 768px) {
+    body {
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background-image: url('/images/site/small_check.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    }
     .content-container {
         width: 90%;
         margin: 2rem auto;
