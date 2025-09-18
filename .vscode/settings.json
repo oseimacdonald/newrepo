@@ -10,7 +10,7 @@
             "previewLimit": 50,
             "server": "localhost",
             "driver": "PostgreSQL",
-            "name": "render",
+            "name": "render.com",
             "connectString": "postgresql://newrepo3:b8uK4PFiYVkIYifYHCMHVGMR7YIvjOd7@dpg-d32rgkje5dus73b6a9gg-a.frankfurt-postgres.render.com/newrepo3"
         }
     ]
