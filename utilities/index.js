@@ -26,12 +26,7 @@ Util.getNav = async function (req, res, next) {
     return list
 }
 
-module.exports = Util
 
-
-
-const invModel = require("../models/inventory-model")
-const Util = {}
 
 
 
@@ -67,3 +62,6 @@ Util.buildClassificationGrid = async function(data){
   }
   return grid
 }
+
+
+module.exports = Util
