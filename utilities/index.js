@@ -63,5 +63,31 @@ Util.buildClassificationGrid = async function(data){
   return grid
 }
 
+/* ************************************************************
+*  * Function to generate html content for a specific vehicle
+*  ********************************************************** */
+exports.generateVehicleHtml = (vehicleData) => {
+  const price = vehicleData.inv_price.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  const mileage = vehicleData.inv_mileage.toLocaleString('en-US');
+  
+  return `
+    <div class="vehicle-detail">
+      <h1>${vehicleData.inv_make} ${vehicleData.inv_model}</h1>
+      <img src="${vehicleData.inv_image_url}" alt="${vehicleData.inv_make} ${vehicleData.inv_model}" class="vehicle-image"/>
+      <div class="vehicle-info">
+        <h2>${vehicleData.inv_year} ${vehicleData.inv_make} ${vehicleData.inv_model}</h2>
+        <p><strong>Price:</strong> ${price}</p>
+        <p><strong>Mileage:</strong> ${mileage} miles</p>
+        <p><strong>Year:</strong> ${vehicleData.inv_year}</p>
+        <p><strong>Engine:</strong> ${vehicleData.inv_engine}</p>
+        <p><strong>Transmission:</strong> ${vehicleData.inv_transmission}</p>
+        <p><strong>Color:</strong> ${vehicleData.inv_color}</p>
+        <p><strong>VIN:</strong> ${vehicleData.inv_vin}</p>
+        <p>${vehicleData.inv_description}</p>
+      </div>
+    </div>
+  `;
+};
+
 
 module.exports = Util

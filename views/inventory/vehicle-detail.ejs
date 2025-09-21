@@ -1,0 +1,58 @@
+<% if (vehicleData) { %>
+  <title><%= vehicleData.inv_make %> <%= vehicleData.inv_model %></title>
+  <h1><%= vehicleData.inv_make %> <%= vehicleData.inv_model %></h1>
+<% } %>
+
+<%- include('../partials/header.ejs') %>
+
+<div class="vehicle-detail-container">
+  <div class="vehicle-detail-content">
+
+    <!-- Vehicle Detail Section -->
+    <section class="featured-vehicle">
+      <h1><%= vehicleData.inv_year %> <%= vehicleData.inv_make %> <%= vehicleData.inv_model %></h1>
+      <div class="vehicle-container-flex">
+        
+        <!-- Vehicle Image -->
+        <div class="vehicle-image">
+          <img src="<%= vehicleData.inv_image %>" 
+               alt="<%= vehicleData.inv_year %> <%= vehicleData.inv_make %> <%= vehicleData.inv_model %>" 
+               width="800" height="450">
+        </div>
+
+        <!-- Vehicle Info + Description -->
+        <div class="vehicle-info">
+          <ul class="specs">
+            <li><strong>Price:</strong> <%= new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(vehicleData.inv_price) %></li>
+            <li><strong>Mileage:</strong> <%= new Intl.NumberFormat('en-US').format(vehicleData.inv_miles) %> miles</li>
+            <li><strong>Year:</strong> <%= vehicleData.inv_year %></li>
+            <li><strong>Color:</strong> <%= vehicleData.inv_color %></li>
+            <% if (vehicleData.inv_engine) { %>
+            <li><strong>Engine:</strong> <%= vehicleData.inv_engine %></li>
+            <% } %>
+            <% if (vehicleData.inv_transmission) { %>
+            <li><strong>Transmission:</strong> <%= vehicleData.inv_transmission %></li>
+            <% } %>
+            <% if (vehicleData.inv_vin) { %>
+            <li><strong>VIN:</strong> <%= vehicleData.inv_vin %></li>
+            <% } %>
+          </ul>
+
+          <div class="buy-now">
+            <a href="#" class="own-today-btn">
+              <img src="/images/site/own_today.png" alt="Own Today - Purchase your vehicle now" width="200" height="60">
+            </a>
+          </div>
+
+          <div class="vehicle-description">
+            <h2>Description</h2>
+            <p><%= vehicleData.inv_description %></p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</div>
+

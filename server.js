@@ -12,6 +12,7 @@ const app = express()
 const static = require("./routes/static")
 const baseController = require("./controllers/baseController")
 const inventoryRoute = require("./routes/inventoryRoute") 
+const errorRoute = require("./routes/errorRoute");
 
 
 /* ***********************
@@ -19,12 +20,15 @@ const inventoryRoute = require("./routes/inventoryRoute")
  *************************/
 app.set("view engine", "ejs")
 app.use(expressLayouts)
-app.set("layout", "./layouts/layout") // not at views root
+app.set("layout", "./layouts/layout") /* not at views root */
 
 /* ***********************
  * Routes
  *************************/
 app.use(static)
+app.use(express.static('public'));
+app.use("/error", errorRoute);
+
 
 // Index route
 app.get("/", baseController.buildHome)
@@ -45,3 +49,20 @@ const host = process.env.HOST
 app.listen(port, () => {
   console.log(`app listening on ${host}:${port}`)
 })
+
+/*  Add this import */
+const handleError = require("./middleware/errorHandler");
+
+
+/* Catch-all 404 (optional) */
+app.use((req, res) => {
+  const nav = ""; /* Optional: replace with await getNav() if needed */
+  res.status(404).render("error", {
+    title: "404 Not Found",
+    nav,
+    message: "The page you’re looking for does not exist.",
+  });
+});
+
+/* Must be LAST middleware */
+app.use(handleError);
