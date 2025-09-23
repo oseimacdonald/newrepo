@@ -40,7 +40,7 @@ invCont.getVehicleDetail = async (req, res) => {
       res.status(404).send('Vehicle not found');
     }
   } catch (error) {
-    console.error("Error fetching vehicle details:", error); // <-- Add this for visibility
+    console.error("Error fetching vehicle details:", error); /* for visibility */
     res.status(500).send('Error fetching vehicle details');
   }
 };
