@@ -14,14 +14,19 @@ const baseController = require("./controllers/baseController")
 const inventoryRoute = require("./routes/inventoryRoute") 
 const session = require("express-session")
 const pool = require('./database/')
+const compression = require('compression');
 const errorRoute = require("./routes/errorRoute");
+const flash = require('connect-flash');
 
+/* ***********************
+ * Middleware Setup
+ *************************/
+// Compression should be early
+app.use(compression());
 
-/* ********************************************
-** Middleware
-** ****************************************** */
+// Session middleware
 app.use(session({
-  store: new(require('connect-pg-simple')(session))({
+  store: new (require('connect-pg-simple')(session))({
     createTableIfMissing: true,
     pool,
   }),
@@ -31,6 +36,18 @@ app.use(session({
   name: 'sessionId',
 }))
 
+// Flash messages middleware (AFTER session)
+app.use(flash());
+
+// Express messages middleware
+app.use(function(req, res, next){
+  res.locals.messages = req.flash(); // This will give you access to flash messages
+  next();
+})
+
+// Body parser middleware (important for form data)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 /* ***********************
  * View Engine and Templates
@@ -42,10 +59,9 @@ app.set("layout", "./layouts/layout") /* not at views root */
 /* ***********************
  * Routes
  *************************/
+// Static routes should come first
 app.use(static)
 app.use(express.static('public'));
-app.use("/error", errorRoute);
-
 
 // Index route
 app.get("/", baseController.buildHome)
@@ -53,12 +69,36 @@ app.get("/", baseController.buildHome)
 // Inventory routes
 app.use("/inv", inventoryRoute)
 
+// Account routes
+app.use("/account", require("./routes/accountRoute"))
+
+// Error routes
+app.use("/error", errorRoute);
+
+/* ***********************
+ * Error Handling Middleware
+ *************************/
+const handleError = require("./middleware/errorHandler");
+
+// Catch-all 404
+app.use((req, res) => {
+  const nav = ""; /* Optional: replace with await getNav() if needed */
+  res.status(404).render("error", {
+    title: "404 Not Found",
+    nav,
+    message: "The page you're looking for does not exist.",
+  });
+});
+
+// Global error handler (must be last)
+app.use(handleError);
+
 /* ***********************
  * Local Server Information
  * Values from .env (environment) file
  *************************/
-const port = process.env.PORT
-const host = process.env.HOST
+const port = process.env.PORT || 5500
+const host = process.env.HOST || 'localhost'
 
 /* ***********************
  * Log statement to confirm server operation
@@ -66,21 +106,3 @@ const host = process.env.HOST
 app.listen(port, () => {
   console.log(`app listening on ${host}:${port}`)
 })
-
-/*  Add this import */
-const handleError = require("./middleware/errorHandler");
-const session = require("express-session")
-
-
-/* Catch-all 404 (optional) */
-app.use((req, res) => {
-  const nav = ""; /* Optional: replace with await getNav() if needed */
-  res.status(404).render("error", {
-    title: "404 Not Found",
-    nav,
-    message: "The page you’re looking for does not exist.",
-  });
-});
-
-/* Must be LAST middleware */
-app.use(handleError);

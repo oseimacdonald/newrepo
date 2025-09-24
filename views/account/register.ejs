@@ -1,0 +1,122 @@
+<% if (messages.notice) { %>
+  <ul class="notice">
+    <% messages.notice.forEach(function(message){ %>
+      <li><%= message %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<%- include('../partials/header') %>
+
+<main class="content-container">
+    <div class="auth-container">
+        <!-- Form Header -->
+        <div class="form-header">
+            <h1><%= title %></h1>
+            <p>Create your Mac Motors account</p>
+        </div>
+
+        <!-- Flash Messages -->
+        <% if (messages && messages.notice && messages.notice.length > 0) { %>
+            <div class="flash-message">
+                <ul class="notice">
+                    <% messages.notice.forEach(function(message){ %>
+                        <li><%= message %></li>
+                    <% }) %>
+                </ul>
+            </div>
+        <% } %>
+
+        <!-- Registration Form -->
+        <form action="/account/register" method="post" class="auth-form" id="registrationForm" novalidate>
+            <!-- First Name -->
+            <div class="form-group">
+                <label for="account_firstname">
+                    First Name <span class="required">*</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="account_firstname" 
+                    name="account_firstname" 
+                    required 
+                    autocomplete="given-name"
+                    value="<%= typeof account_firstname !== 'undefined' ? account_firstname : '' %>"
+                    minlength="2"
+                    maxlength="50"
+                    placeholder="Enter your first name"
+                >
+            </div>
+            
+            <!-- Last Name -->
+            <div class="form-group">
+                <label for="account_lastname">
+                    Last Name <span class="required">*</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="account_lastname" 
+                    name="account_lastname" 
+                    required 
+                    autocomplete="family-name"
+                    value="<%= typeof account_lastname !== 'undefined' ? account_lastname : '' %>"
+                    minlength="2"
+                    maxlength="50"
+                    placeholder="Enter your last name"
+                >
+            </div>
+            
+            <!-- Email -->
+            <div class="form-group">
+                <label for="account_email">
+                    Email Address <span class="required">*</span>
+                </label>
+                <input 
+                    type="email" 
+                    id="account_email" 
+                    name="account_email" 
+                    required 
+                    autocomplete="email"
+                    value="<%= typeof account_email !== 'undefined' ? account_email : '' %>"
+                    placeholder="Enter your email address"
+                >
+            </div>
+            
+            <!-- Password -->
+            <div class="form-group">
+                <label for="account_password">
+                    Password <span class="required">*</span>
+                </label>
+                <div class="password-container">
+                    <input 
+                        type="password" 
+                        id="account_password" 
+                        name="account_password" 
+                        required 
+                        autocomplete="new-password"
+                        minlength="12"
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$"
+                        placeholder="Create a strong password"
+                    >
+                    <span id="togglePassword" class="toggle-password" style="cursor: pointer;">Show</span>
+                </div>
+                
+                <!-- Password Requirements -->
+                <div class="requirements">
+                    <h4>Password Requirements:</h4>
+                    <ul>
+                        <li>Minimum 12 characters in length</li>
+                        <li>Contain at least 1 capital letter (A-Z)</li>
+                        <li>Contain at least 1 number (0-9)</li>
+                        <li>Contain at least 1 special character (@$!%*?&)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn">Create Account</button>
+            
+            <div class="login-link">
+                <p>Already have an account? <a href="/account/login">Sign in here</a></p>
+            </div>
+        </form>
+    </div>
+</main>
