@@ -12,7 +12,24 @@ const app = express()
 const static = require("./routes/static")
 const baseController = require("./controllers/baseController")
 const inventoryRoute = require("./routes/inventoryRoute") 
+const session = require("express-session")
+const pool = require('./database/')
 const errorRoute = require("./routes/errorRoute");
+
+
+/* ********************************************
+** Middleware
+** ****************************************** */
+app.use(session({
+  store: new(require('connect-pg-simple')(session))({
+    createTableIfMissing: true,
+    pool,
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+  name: 'sessionId',
+}))
 
 
 /* ***********************
@@ -52,6 +69,7 @@ app.listen(port, () => {
 
 /*  Add this import */
 const handleError = require("./middleware/errorHandler");
+const session = require("express-session")
 
 
 /* Catch-all 404 (optional) */
