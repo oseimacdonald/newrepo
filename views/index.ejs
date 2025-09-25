@@ -7,13 +7,23 @@
 <!-- Featured Vehicle Section -->
 <section class="featured-vehicle">
     <h2>Featured Vehicle</h2>
-    <%- messages() %>
+
+    <!-- Flash Messages -->
+    <% if (messages && messages.notice && messages.notice.length > 0) { %>
+        <div class="flash-message">
+            <ul class="notice">
+                <% messages.notice.forEach(function(message) { %>
+                    <li><%= message %></li>
+                <% }) %>
+            </ul>
+        </div>
+    <% } %>
+
     <div class="vehicle-container">
         <div class="vehicle-image">
             <img src="/images/vehicles/delorean-tn.jpg"
                  srcset="/images/vehicles/delorean-tn.jpg 1x, /images/vehicles/delorean.jpg 2x" 
-                 alt="Delorean DMC-12 luxury sports car with stainless steel body and gull-wing doors" width="800" height="450"
-            >
+                 alt="Delorean DMC-12 luxury sports car with stainless steel body and gull-wing doors" width="800" height="450">
             <div class="vehicle-details-overlay">
                 <h3>Delorean DMC-12</h3>
                 <ul class="specs">
@@ -44,32 +54,24 @@
             <div class="review-content">
                 <h3>Great Scott! This car is amazing!</h3>
                 <div class="review-meta">By Emmett B. · October 26, 1985</div>
-                <p>
-                    This car exceeds all my expectations. The stainless steel body is not only beautiful but also resistant to corrosion. The gull-wing doors are a conversation starter everywhere I go. (5/5)
-                </p>
+                <p>This car exceeds all my expectations. The stainless steel body is not only beautiful but also resistant to corrosion. The gull-wing doors are a conversation starter everywhere I go. (5/5)</p>
             </div>
         </div>
-
         <div class="review-item">
             <div class="review-content">
                 <h3>Perfect for time travel</h3>
                 <div class="review-meta">By Marty M. · November 5, 1985</div>
-                <p>
-                    I've put my Delorean through some serious temporal displacements and it handles like a dream. The flux capacitor integration was seamless and the technicians at Mac Motors really know their stuff. (4/5)
-                </p>
+                <p>I've put my Delorean through some serious temporal displacements and it handles like a dream. The flux capacitor integration was seamless and the technicians at Mac Motors really know their stuff. (4/5)</p>
             </div>
         </div>
-
         <div class="review-item">
             <div class="review-content">
                 <h3>Head-turning classic</h3>
                 <div class="review-meta">By Jennifer P. · December 12, 1985</div>
-                <p>
-                    I get compliments everywhere I go. The unique design and stainless steel finish make this car stand out from everything else on the road. The team at Mac Motors provided excellent service throughout the purchase process. (4/5)
-                </p>
+                <p>I get compliments everywhere I go. The unique design and stainless steel finish make this car stand out from everything else on the road. The team at Mac Motors provided excellent service throughout the purchase process. (4/5)</p>
             </div>
         </div>
-    </div> <!-- END .reviews -->
+    </div>
 
     <div class="upgrades">
         <h2>Delorean Upgrades</h2>
@@ -116,4 +118,4 @@
             </div>
         </div>
     </div>
-</section> <!-- END .details-reviews -->
+</section>
