@@ -4,18 +4,26 @@
 <title><%- title %></title>
 <meta name="description" content="Discover premium vehicles at Mac Motors. Featuring the iconic Delorean DMC-12 with custom upgrades including flux capacitors, stainless steel hub caps, and time traveler packages.">
 
-<!-- Favicon -->
-<link rel="icon" href="/images/favicon/favicon.ico" type="image/x-icon">
+<!-- Preload LCP image -->
+<link rel="preload" href="/optimized/vehicles/delorean-tn.webp" as="image" fetchpriority="high">
 
-<!--Google Fonts  --> 
+<!-- Only preload if the file exists -->
+<link rel="preload" href="/css/styles.css" as="style" fetchpriority="high">
+<link rel="preload" href="/js/script.js" as="script">
+
+<!-- Google Fonts optimization -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
- 
-<!--          js script -->
-<script src="/js/script.js" defer></script>  
-    <!-- CSS Files -->
-<!-- Preload main CSS -->
-<link rel="preload" href="/css/styles.css" as="style">
+
+<!-- Modern favicon setup - check what files actually exist -->
+<link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico">
+<link rel="icon" type="image/webp" href="/optimized/favicon/favicon-32x32.webp" sizes="32x32">
+<link rel="icon" type="image/webp" href="/optimized/favicon/favicon-16x16.webp" sizes="16x16">
+<link rel="apple-touch-icon" href="/optimized/favicon/apple-touch-icon.webp">
+<link rel="manifest" href="/site.webmanifest">
+
+<!-- Critical CSS -->
 <link rel="stylesheet" href="/css/styles.css" media="all">
 
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"> -->
+<!-- JS Script -->
+<script src="/js/script.js" defer></script>

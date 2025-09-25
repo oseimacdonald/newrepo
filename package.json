@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "optimize-images": "node optimize-images.js",
+    "build": "pnpm run optimize-images && node server.js",
+    "build:dev": "pnpm run optimize-images && nodemon server.js"
   },
   "author": "",
   "license": "ISC",
@@ -25,7 +28,13 @@
     "pg": "^8.8.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "imagemin": "^9.0.1",
+    "imagemin-cli": "^8.0.0",
+    "imagemin-mozjpeg": "^10.0.0",
+    "imagemin-pngquant": "9.0.2",
+    "nodemon": "^3.1.0",
+    "pngquant-bin": "^9.0.0",
+    "sharp": "^0.34.4"
   },
   "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a"
 }

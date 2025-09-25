@@ -1,2 +1,8 @@
 ignoredBuiltDependencies:
   - bcrypt
+  - gifsicle
+  - jpegtran-bin
+  - mozjpeg
+  - optipng-bin
+  - pngquant-bin
+  - sharp
