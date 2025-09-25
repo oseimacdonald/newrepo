@@ -1,0 +1,40 @@
+{
+  "name": "Mac Motors",
+  "short_name": "MacMotors",
+  "description": "Your premier destination for quality vehicles and exceptional service",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/optimized/favicon/favicon-32x32.webp",
+      "sizes": "32x32",
+      "type": "image/webp"
+    },
+    {
+      "src": "/optimized/favicon/favicon-16x16.webp",
+      "sizes": "16x16",
+      "type": "image/webp"
+    },
+    {
+      "src": "/optimized/favicon/apple-touch-icon.webp",
+      "sizes": "180x180",
+      "type": "image/webp"
+    },
+    {
+      "src": "/images/favicon/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/favicon/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["automotive", "vehicles", "cars"]
+}
