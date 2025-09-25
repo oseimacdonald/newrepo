@@ -1,71 +1,118 @@
-// account controller
 const utilities = require('../utilities')
 const bcrypt = require("bcryptjs")
-const pool = require('../database/')
+const accountModel = require('../models/account-model')
 
-// Deliver login view
+/* ---------- Password Validation Helper ---------- */
+function validatePassword(password) {
+    const errors = []
+
+    if (password.length < 12) {
+        errors.push("Password must be at least 12 characters long")
+    }
+    if (!/[A-Z]/.test(password)) {
+        errors.push("Password must contain at least one uppercase letter")
+    }
+    if (!/[a-z]/.test(password)) {
+        errors.push("Password must contain at least one lowercase letter")
+    }
+    if (!/\d/.test(password)) {
+        errors.push("Password must contain at least one number")
+    }
+    if (!/[@$!%*?&]/.test(password)) {
+        errors.push("Password must contain at least one special character (@$!%*?&)")
+    }
+
+    return errors
+}
+
+/* ---------- GET: Login View ---------- */
 async function buildLogin(req, res, next) {
-    let nav = await utilities.getNav()
+    const nav = await utilities.getNav()
+    // Removed explicit req.flash() call here to avoid consuming flash messages early
     res.render("account/login", {
         title: "Login",
         nav,
+        // messages will be available in the view as res.locals.messages by middleware
     })
 }
 
-// Deliver registration view
+/* ---------- GET: Register View ---------- */
 async function buildRegister(req, res, next) {
-    let nav = await utilities.getNav()
+    const nav = await utilities.getNav()
+    // Removed explicit req.flash() call here as well
     res.render("account/register", {
         title: "Register",
         nav,
-        errors: null,
+        account_firstname: req.body?.account_firstname || '',
+        account_lastname: req.body?.account_lastname || '',
+        account_email: req.body?.account_email || ''
+        // messages available via res.locals.messages in views
     })
 }
 
-// Handle account registration
+/* ---------- POST: Handle Registration ---------- */
 async function registerAccount(req, res, next) {
     try {
-        const { account_firstname, account_lastname, account_email, account_password } = req.body;
+        const { account_firstname, account_lastname, account_email, account_password } = req.body
 
-        // Basic validation
+        // Validation: Required fields
         if (!account_firstname || !account_lastname || !account_email || !account_password) {
-            req.flash("notice", "Please fill in all required fields.");
-            return res.redirect("/account/register");
+            req.flash("notice", "Please fill in all required fields.")
+            return res.redirect("/account/register")
         }
 
-        // Check if email already exists
-        const existingUser = await pool.query(
-            "SELECT * FROM account WHERE account_email = $1",
-            [account_email]
-        );
-        
-        if (existingUser.rows.length > 0) {
-            req.flash("notice", "An account with this email already exists.");
-            return res.redirect("/account/register");
+        // Validation: Password strength
+        const passwordErrors = validatePassword(account_password)
+        if (passwordErrors.length > 0) {
+            req.flash("notice", passwordErrors)
+            return res.redirect("/account/register")
         }
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(account_password, 10);
+        // Validation: Duplicate email
+        const emailExists = await accountModel.checkExistingEmail(account_email)
+        if (emailExists) {
+            req.flash("notice", "An account with this email already exists.")
+            return res.redirect("/account/register")
+        }
 
-        // Insert new user into database
-        const result = await pool.query(
-            `INSERT INTO account (account_firstname, account_lastname, account_email, account_password)
-             VALUES ($1, $2, $3, $4) RETURNING account_id`,
-            [account_firstname, account_lastname, account_email, hashedPassword]
-        );
+        // Hash password
+        const saltRounds = process.env.NODE_ENV === 'production' ? 10 : 4
+        const hashedPassword = await bcrypt.hash(account_password, saltRounds)
 
-        if (result.rows.length > 0) {
-            req.flash("notice", "Registration successful. Please log in.");
-            return res.redirect("/account/login");
+
+        // Register the account
+        const regResult = await accountModel.registerAccount(
+            account_firstname,
+            account_lastname,
+            account_email,
+            hashedPassword
+        )
+
+        if (regResult && regResult.rows && regResult.rows.length > 0) {
+            req.flash("notice", `Congratulations, you're registered ${account_firstname}. Please log in.`)
+            return res.redirect("/account/login")
         } else {
-            req.flash("notice", "Registration failed. Please try again.");
-            return res.redirect("/account/register");
+            req.flash("notice", "Sorry, the registration failed.")
+            return res.redirect("/account/register")
         }
+
     } catch (error) {
-        console.error("Registration error:", error);
-        req.flash("notice", "Registration error. Please try again.");
-        return res.redirect("/account/register");
+        console.error("Registration error:", error)
+        req.flash("notice", "An error occurred during registration. Please try again.")
+        return res.redirect("/account/register")
     }
 }
 
-module.exports = { buildLogin, buildRegister, registerAccount }
+/* ---------- POST: Login (Stub) ---------- */
+async function accountLogin(req, res, next) {
+    req.flash("notice", "Login functionality coming soon!")
+    return res.redirect("/account/login")
+}
+
+/* ---------- Export Controllers ---------- */
+module.exports = {
+    buildLogin,
+    buildRegister,
+    registerAccount,
+    accountLogin
+}

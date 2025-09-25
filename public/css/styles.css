@@ -1,3 +1,6 @@
+npx imagemin public/images/* --out-dir=public/images
+
+
 /* CSS Reset */
 * {
     margin: 0;
@@ -707,19 +710,30 @@ a:focus, button:focus {
 
 .password-container {
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .toggle-password {
-  color: #007bff;
-  font-weight: 500;
-  margin-left: 10px;
-  user-select: none;
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #007bff;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
 }
 
 .toggle-password:hover {
   text-decoration: underline;
 }
 
+/* password input padding for the button */
+.password-container input {
+    padding-right: 70px;
+}
 
 .requirements {
     background: #f7fafc;
@@ -775,7 +789,7 @@ a:focus, button:focus {
 }
 
 .login-link a {
-    color: #4299e1;
+    color: #092f09;
     text-decoration: none;
     font-weight: 600;
 }
@@ -785,7 +799,7 @@ a:focus, button:focus {
 }
 
 .required {
-    color: #e53e3e;
+    color: #570505;
 }
 
 .flash-message {
@@ -804,11 +818,20 @@ a:focus, button:focus {
 }
 
 .flash-message .notice li {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #feb2b2;
 }
 
 .flash-message .notice li:last-child {
     margin-bottom: 0;
+    border-bottom: none;
+}
+
+/* error state for invalid fields */
+.form-group input:invalid {
+    border-color: #e53e3e;
+    box-shadow: 0 0 0 3px rgba(229, 62,62, 0.1);
 }
 
 .form-header {

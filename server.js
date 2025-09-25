@@ -47,7 +47,11 @@ app.use(function(req, res, next){
 
 // Body parser middleware (important for form data)
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+/* ***************************************************************************************
+**This is the equivalent of body-parser(performs the same function as using the 
+**separate body-parser middleware, which used to be a common practice before Express 4.16.0.)
+* **************************************************************************************** */
+app.use(express.urlencoded({ extended: true })); 
 
 /* ***********************
  * View Engine and Templates
@@ -60,8 +64,8 @@ app.set("layout", "./layouts/layout") /* not at views root */
  * Routes
  *************************/
 // Static routes should come first
-app.use(static)
 app.use(express.static('public'));
+app.use(static)
 
 // Index route
 app.get("/", baseController.buildHome)

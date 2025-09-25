@@ -1,10 +1,13 @@
-<% if (messages.notice) { %>
-  <ul class="notice">
-    <% messages.notice.forEach(function(message){ %>
-      <li><%= message %></li>
-    <% }) %>
-  </ul>
+<% if (messages && messages.notice && messages.notice.length) { %>
+  <div class="flash-message">
+    <ul class="notice">
+      <% messages.notice.forEach(function(message) { %>
+        <li><%= message %></li>
+      <% }) %>
+    </ul>
+  </div>
 <% } %>
+
 
 <h1><%= title %></h1>
 

@@ -1,11 +1,3 @@
-<% if (messages.notice) { %>
-  <ul class="notice">
-    <% messages.notice.forEach(function(message){ %>
-      <li><%= message %></li>
-    <% }) %>
-  </ul>
-<% } %>
-
 <%- include('../partials/header') %>
 
 <main class="content-container">
@@ -27,7 +19,7 @@
             </div>
         <% } %>
 
-        <!-- Registration Form -->
+        <!-- Registration Form - CORRECT ACTION AND METHOD -->
         <form action="/account/register" method="post" class="auth-form" id="registrationForm" novalidate>
             <!-- First Name -->
             <div class="form-group">
@@ -97,7 +89,7 @@
                         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$"
                         placeholder="Create a strong password"
                     >
-                    <span id="togglePassword" class="toggle-password" style="cursor: pointer;">Show</span>
+                    <button type="button" id="togglePassword" class="toggle-password">Show</button>
                 </div>
                 
                 <!-- Password Requirements -->
@@ -120,3 +112,25 @@
         </form>
     </div>
 </main>
+
+<!--
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const toggleButton = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('account_password');
+
+  if (toggleButton && passwordInput) {
+    toggleButton.addEventListener('click', function (event) {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      toggleButton.textContent = type === 'password' ? 'Show' : 'Hide';
+      
+      event.preventDefault();
+      event.stopPropagation();
+    });
+  }
+});
+</script>
+
+-->
