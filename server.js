@@ -36,8 +36,10 @@ app.use(session({
   name: 'sessionId',
 }))
 
+
 // Flash messages middleware (AFTER session)
 app.use(flash());
+
 
 // Express messages middleware
 app.use(function(req, res, next){

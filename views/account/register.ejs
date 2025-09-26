@@ -1,5 +1,3 @@
-<%- include('../partials/header') %>
-
 <main class="content-container">
     <div class="auth-container">
         <!-- Form Header -->
@@ -8,7 +6,7 @@
             <p>Create your Mac Motors account</p>
         </div>
 
-        <!-- Flash Messages -->
+        <!-- Server-Side Messages Only -->
         <% if (messages && messages.notice && messages.notice.length > 0) { %>
             <div class="flash-message">
                 <ul class="notice">
@@ -19,8 +17,20 @@
             </div>
         <% } %>
 
-        <!-- Registration Form - CORRECT ACTION AND METHOD -->
-        <form action="/account/register" method="post" class="auth-form" id="registrationForm" novalidate>
+        <!-- Server-Side Validation Errors -->
+        <% if (errors && errors.array && errors.array().length > 0) { %>
+            <div class="flash-message error">
+                <ul class="notice">
+                    <% errors.array().forEach(function(error){ %>
+                        <li><%= error.msg %></li>
+                    <% }) %>
+                </ul>
+            </div>
+        <% } %>
+
+        <!-- Registration Form - Client-Side Validation by Default -->
+        <form action="/account/register" method="post" class="auth-form" id="registrationForm">
+            
             <!-- First Name -->
             <div class="form-group">
                 <label for="account_firstname">
@@ -30,15 +40,15 @@
                     type="text" 
                     id="account_firstname" 
                     name="account_firstname" 
-                    required 
-                    autocomplete="given-name"
-                    value="<%= typeof account_firstname !== 'undefined' ? account_firstname : '' %>"
+                    required
                     minlength="2"
                     maxlength="50"
+                    autocomplete="given-name"
+                    value="<%= typeof account_firstname !== 'undefined' ? account_firstname : '' %>"
                     placeholder="Enter your first name"
                 >
             </div>
-            
+
             <!-- Last Name -->
             <div class="form-group">
                 <label for="account_lastname">
@@ -48,11 +58,11 @@
                     type="text" 
                     id="account_lastname" 
                     name="account_lastname" 
-                    required 
-                    autocomplete="family-name"
-                    value="<%= typeof account_lastname !== 'undefined' ? account_lastname : '' %>"
+                    required
                     minlength="2"
                     maxlength="50"
+                    autocomplete="family-name"
+                    value="<%= typeof account_lastname !== 'undefined' ? account_lastname : '' %>"
                     placeholder="Enter your last name"
                 >
             </div>
@@ -66,13 +76,13 @@
                     type="email" 
                     id="account_email" 
                     name="account_email" 
-                    required 
+                    required
                     autocomplete="email"
                     value="<%= typeof account_email !== 'undefined' ? account_email : '' %>"
                     placeholder="Enter your email address"
                 >
             </div>
-            
+
             <!-- Password -->
             <div class="form-group">
                 <label for="account_password">
@@ -83,10 +93,10 @@
                         type="password" 
                         id="account_password" 
                         name="account_password" 
-                        required 
-                        autocomplete="new-password"
+                        required
                         minlength="12"
                         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$"
+                        autocomplete="new-password"
                         placeholder="Create a strong password"
                     >
                     <button type="button" id="togglePassword" class="toggle-password">Show</button>
@@ -103,9 +113,9 @@
                     </ul>
                 </div>
             </div>
-            
+
             <button type="submit" class="submit-btn">Create Account</button>
-            
+
             <div class="login-link">
                 <p>Already have an account? <a href="/account/login">Sign in here</a></p>
             </div>
@@ -113,24 +123,51 @@
     </div>
 </main>
 
-<!--
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  const toggleButton = document.getElementById('togglePassword');
-  const passwordInput = document.getElementById('account_password');
+    // Password toggle
+    const toggleButton = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('account_password');
 
-  if (toggleButton && passwordInput) {
-    toggleButton.addEventListener('click', function (event) {
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
-      toggleButton.textContent = type === 'password' ? 'Show' : 'Hide';
-      
-      event.preventDefault();
-      event.stopPropagation();
-    });
-  }
+    if (toggleButton && passwordInput) {
+        toggleButton.addEventListener('click', function () {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            toggleButton.textContent = type === 'password' ? 'Show' : 'Hide';
+        });
+    }
+
+    // 🎯 CLEAR MESSAGES IMMEDIATELY (no delay)
+    const flashMessages = document.querySelectorAll('.flash-message');
+    
+    // Check if we should clear messages (reload or has cleared parameter)
+    const urlParams = new URLSearchParams(window.location.search);
+    const shouldClear = performance.navigation?.type === 1 || urlParams.has('cleared');
+    
+    if (shouldClear && flashMessages.length > 0) {
+        // Remove messages immediately
+        flashMessages.forEach(msg => msg.remove());
+        
+        // Add cleared parameter to prevent future shows
+        if (!urlParams.has('cleared')) {
+            const newUrl = window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'cleared=true';
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    }
+
+    // 🎯 Handle novalidate parameter
+    if (urlParams.has('novalidate')) {
+        document.getElementById('registrationForm').setAttribute('novalidate', 'novalidate');
+        
+        // Clean URL but keep cleared parameter
+        const baseUrl = window.location.href.split('?')[0];
+        const cleanUrl = urlParams.has('cleared') ? baseUrl + '?cleared=true' : baseUrl;
+        window.history.replaceState({}, document.title, cleanUrl);
+        
+        console.log('🔧 Server-side mode active');
+    } else {
+        document.getElementById('registrationForm').removeAttribute('novalidate');
+        console.log('🔒 Client-side mode active');
+    }
 });
 </script>
-
--->
