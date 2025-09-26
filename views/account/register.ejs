@@ -28,14 +28,12 @@
             </div>
         <% } %>
 
-        <!-- Registration Form - Client-Side Validation by Default -->
+        <!-- Registration Form -->
         <form action="/account/register" method="post" class="auth-form" id="registrationForm">
             
             <!-- First Name -->
             <div class="form-group">
-                <label for="account_firstname">
-                    First Name <span class="required">*</span>
-                </label>
+                <label for="account_firstname">First Name <span class="required">*</span></label>
                 <input 
                     type="text" 
                     id="account_firstname" 
@@ -51,9 +49,7 @@
 
             <!-- Last Name -->
             <div class="form-group">
-                <label for="account_lastname">
-                    Last Name <span class="required">*</span>
-                </label>
+                <label for="account_lastname">Last Name <span class="required">*</span></label>
                 <input 
                     type="text" 
                     id="account_lastname" 
@@ -69,9 +65,7 @@
             
             <!-- Email -->
             <div class="form-group">
-                <label for="account_email">
-                    Email Address <span class="required">*</span>
-                </label>
+                <label for="account_email">Email Address <span class="required">*</span></label>
                 <input 
                     type="email" 
                     id="account_email" 
@@ -83,11 +77,9 @@
                 >
             </div>
 
-            <!-- Password -->
+            <!-- Password - FIXED PATTERN -->
             <div class="form-group">
-                <label for="account_password">
-                    Password <span class="required">*</span>
-                </label>
+                <label for="account_password">Password <span class="required">*</span></label>
                 <div class="password-container">
                     <input 
                         type="password" 
@@ -95,9 +87,10 @@
                         name="account_password" 
                         required
                         minlength="12"
-                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$"
+                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{12,}"
+                        title="Must contain: 12+ characters, 1 uppercase, 1 lowercase, 1 number, 1 special character (@$!%*?&)"
                         autocomplete="new-password"
-                        placeholder="Create a strong password"
+                        placeholder="Example: MyPassword123!"
                     >
                     <button type="button" id="togglePassword" class="toggle-password">Show</button>
                 </div>
@@ -111,6 +104,7 @@
                         <li>Contain at least 1 number (0-9)</li>
                         <li>Contain at least 1 special character (@$!%*?&)</li>
                     </ul>
+                    <p><strong>Example valid password:</strong> <code>Test123!@#test</code></p>
                 </div>
             </div>
 
@@ -125,10 +119,11 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Password toggle
+    const form = document.getElementById('registrationForm');
     const toggleButton = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('account_password');
 
+    // Password toggle
     if (toggleButton && passwordInput) {
         toggleButton.addEventListener('click', function () {
             const type = passwordInput.type === 'password' ? 'text' : 'password';
@@ -137,36 +132,67 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 🎯 CLEAR MESSAGES IMMEDIATELY (no delay)
-    const flashMessages = document.querySelectorAll('.flash-message');
-    
-    // Check if we should clear messages (reload or has cleared parameter)
     const urlParams = new URLSearchParams(window.location.search);
-    const shouldClear = performance.navigation?.type === 1 || urlParams.has('cleared');
+    const isReload = performance.navigation?.type === 1;
     
-    if (shouldClear && flashMessages.length > 0) {
-        // Remove messages immediately
-        flashMessages.forEach(msg => msg.remove());
+    // 🎯 CLEAR INPUT FIELDS ON RELOAD (unless they have server values)
+    if (isReload) {
+        const inputs = document.querySelectorAll('#account_firstname, #account_lastname, #account_email, #account_password');
+        inputs.forEach(input => {
+            // Only clear if empty or has placeholder values
+            if (!input.value || input.value === 'undefined' || input.value === input.getAttribute('placeholder')) {
+                input.value = '';
+            }
+        });
+    }
+
+    // 🎯 CLEAR FLASH MESSAGES ON RELOAD
+    if (isReload) {
+        setTimeout(() => {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(msg => msg.remove());
+        }, 100);
+    }
+
+    // 🎯 DEBUG PASSWORD VALIDATION
+    if (passwordInput) {
+        // Test the pattern with a valid password
+        const testPattern = () => {
+            const testPasswords = [
+                'Test123!@#test',    // Valid
+                'Password123!',      // Valid  
+                'Abc123!@#',         // Valid but short
+                'test123'            // Invalid
+            ];
+            
+            testPasswords.forEach(pwd => {
+                const isValid = new RegExp(passwordInput.pattern).test(pwd);
+                console.log(`Password "${pwd}": ${isValid ? 'VALID' : 'INVALID'}`);
+            });
+        };
         
-        // Add cleared parameter to prevent future shows
-        if (!urlParams.has('cleared')) {
-            const newUrl = window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'cleared=true';
-            window.history.replaceState({}, document.title, newUrl);
-        }
+        testPattern(); // Run test on load
+        
+        // Log validation changes
+        passwordInput.addEventListener('input', function() {
+            console.log('Password validation:', {
+                value: this.value,
+                valid: this.validity.valid,
+                tooShort: this.validity.tooShort,
+                patternMismatch: this.validity.patternMismatch,
+                pattern: this.pattern
+            });
+        });
     }
 
     // 🎯 Handle novalidate parameter
     if (urlParams.has('novalidate')) {
-        document.getElementById('registrationForm').setAttribute('novalidate', 'novalidate');
-        
-        // Clean URL but keep cleared parameter
-        const baseUrl = window.location.href.split('?')[0];
-        const cleanUrl = urlParams.has('cleared') ? baseUrl + '?cleared=true' : baseUrl;
+        form.setAttribute('novalidate', 'novalidate');
+        const cleanUrl = window.location.href.split('?')[0];
         window.history.replaceState({}, document.title, cleanUrl);
-        
         console.log('🔧 Server-side mode active');
     } else {
-        document.getElementById('registrationForm').removeAttribute('novalidate');
+        form.removeAttribute('novalidate');
         console.log('🔒 Client-side mode active');
     }
 });
