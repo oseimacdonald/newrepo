@@ -1,110 +1,76 @@
 <main class="content-container">
     <div class="auth-container">
-        <!-- Form Header -->
         <div class="form-header">
             <h1><%= title %></h1>
             <p>Create your Mac Motors account</p>
         </div>
 
-        <!-- Server-Side Messages Only -->
-        <% if (messages && messages.notice && messages.notice.length > 0) { %>
-            <div class="flash-message">
+        <% if (errors) { %>
+            <div class="message error">
                 <ul class="notice">
-                    <% messages.notice.forEach(function(message){ %>
-                        <li><%= message %></li>
-                    <% }) %>
-                </ul>
-            </div>
-        <% } %>
-
-        <!-- Server-Side Validation Errors -->
-        <% if (errors && errors.array && errors.array().length > 0) { %>
-            <div class="flash-message error">
-                <ul class="notice">
-                    <% errors.array().forEach(function(error){ %>
+                    <% errors.array().forEach(error => { %>
                         <li><%= error.msg %></li>
                     <% }) %>
                 </ul>
             </div>
         <% } %>
 
-        <!-- Registration Form -->
         <form action="/account/register" method="post" class="auth-form" id="registrationForm">
             
-            <!-- First Name -->
             <div class="form-group">
-                <label for="account_firstname">First Name <span class="required">*</span></label>
+                <label for="account_firstname">First Name *</label>
                 <input 
                     type="text" 
                     id="account_firstname" 
                     name="account_firstname" 
-                    required
-                    minlength="2"
-                    maxlength="50"
-                    autocomplete="given-name"
-                    value="<%= typeof account_firstname !== 'undefined' ? account_firstname : '' %>"
+                    value="<%= account_firstname || '' %>"
                     placeholder="Enter your first name"
+                    required
                 >
             </div>
 
-            <!-- Last Name -->
             <div class="form-group">
-                <label for="account_lastname">Last Name <span class="required">*</span></label>
+                <label for="account_lastname">Last Name *</label>
                 <input 
                     type="text" 
                     id="account_lastname" 
                     name="account_lastname" 
-                    required
-                    minlength="2"
-                    maxlength="50"
-                    autocomplete="family-name"
-                    value="<%= typeof account_lastname !== 'undefined' ? account_lastname : '' %>"
+                    value="<%= account_lastname || '' %>"
                     placeholder="Enter your last name"
+                    required
                 >
             </div>
             
-            <!-- Email -->
             <div class="form-group">
-                <label for="account_email">Email Address <span class="required">*</span></label>
+                <label for="account_email">Email Address *</label>
                 <input 
                     type="email" 
                     id="account_email" 
                     name="account_email" 
-                    required
-                    autocomplete="email"
-                    value="<%= typeof account_email !== 'undefined' ? account_email : '' %>"
+                    value="<%= account_email || '' %>"
                     placeholder="Enter your email address"
+                    required
                 >
             </div>
 
-            <!-- Password - FIXED PATTERN -->
             <div class="form-group">
-                <label for="account_password">Password <span class="required">*</span></label>
-                <div class="password-container">
-                    <input 
-                        type="password" 
-                        id="account_password" 
-                        name="account_password" 
-                        required
-                        minlength="12"
-                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{12,}"
-                        title="Must contain: 12+ characters, 1 uppercase, 1 lowercase, 1 number, 1 special character (@$!%*?&)"
-                        autocomplete="new-password"
-                        placeholder="Example: MyPassword123!"
-                    >
-                    <button type="button" id="togglePassword" class="toggle-password">Show</button>
-                </div>
-                
-                <!-- Password Requirements -->
+                <label for="account_password">Password *</label>
+                <input 
+                    type="password" 
+                    id="account_password" 
+                    name="account_password" 
+                    placeholder="Enter your password"
+                    required
+                >
                 <div class="requirements">
-                    <h4>Password Requirements:</h4>
+                    <strong>Password Requirements:</strong>
                     <ul>
-                        <li>Minimum 12 characters in length</li>
-                        <li>Contain at least 1 capital letter (A-Z)</li>
-                        <li>Contain at least 1 number (0-9)</li>
-                        <li>Contain at least 1 special character (@$!%*?&)</li>
+                        <li>At least 12 characters</li>
+                        <li>1 uppercase letter</li>
+                        <li>1 lowercase letter</li>
+                        <li>1 number</li>
+                        <li>1 special character</li>
                     </ul>
-                    <p><strong>Example valid password:</strong> <code>Test123!@#test</code></p>
                 </div>
             </div>
 
@@ -116,86 +82,3 @@
         </form>
     </div>
 </main>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('registrationForm');
-    const toggleButton = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('account_password');
-
-    // Password toggle
-    if (toggleButton && passwordInput) {
-        toggleButton.addEventListener('click', function () {
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-            toggleButton.textContent = type === 'password' ? 'Show' : 'Hide';
-        });
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const isReload = performance.navigation?.type === 1;
-    
-    // 🎯 CLEAR INPUT FIELDS ON RELOAD (unless they have server values)
-    if (isReload) {
-        const inputs = document.querySelectorAll('#account_firstname, #account_lastname, #account_email, #account_password');
-        inputs.forEach(input => {
-            // Only clear if empty or has placeholder values
-            if (!input.value || input.value === 'undefined' || input.value === input.getAttribute('placeholder')) {
-                input.value = '';
-            }
-        });
-    }
-
-    // 🎯 CLEAR FLASH MESSAGES ON RELOAD
-    if (isReload) {
-        setTimeout(() => {
-            const flashMessages = document.querySelectorAll('.flash-message');
-            flashMessages.forEach(msg => msg.remove());
-        }, 100);
-    }
-
-    /*
-    // 🎯 DEBUG PASSWORD VALIDATION
-    if (passwordInput) {
-        // Test the pattern with a valid password
-        const testPattern = () => {
-            const testPasswords = [
-                'Test123!@#test',    // Valid
-                'Password123!',      // Valid  
-                'Abc123!@#',         // Valid but short
-                'test123'            // Invalid
-            ];
-            
-            testPasswords.forEach(pwd => {
-                const isValid = new RegExp(passwordInput.pattern).test(pwd);
-                console.log(`Password "${pwd}": ${isValid ? 'VALID' : 'INVALID'}`);
-            });
-        };
-        
-        testPattern(); // Run test on load
-        
-        // Log validation changes
-        passwordInput.addEventListener('input', function() {
-            console.log('Password validation:', {
-                value: this.value,
-                valid: this.validity.valid,
-                tooShort: this.validity.tooShort,
-                patternMismatch: this.validity.patternMismatch,
-                pattern: this.pattern
-            });
-        });
-    }
-        */
-
-    // 🎯 Handle novalidate parameter
-    if (urlParams.has('novalidate')) {
-        form.setAttribute('novalidate', 'novalidate');
-        const cleanUrl = window.location.href.split('?')[0];
-        window.history.replaceState({}, document.title, cleanUrl);
-        console.log('🔧 Server-side mode active');
-    } else {
-        form.removeAttribute('novalidate');
-        console.log('🔒 Client-side mode active');
-    }
-});
-</script>
