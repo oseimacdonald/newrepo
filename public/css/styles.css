@@ -1,5 +1,3 @@
-npx imagemin public/images/* --out-dir=public/images/optimized
-
 /* CSS Reset */
 * {
     margin: 0;
