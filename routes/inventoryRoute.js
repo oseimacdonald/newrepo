@@ -4,27 +4,40 @@ const router = new express.Router()
 const invController = require("../controllers/invController")
 const utilities = require("../utilities")
 const classValidate = require("../utilities/classification-validation");
-
+const inventoryValidation = require("../utilities/inventory-validation"); // Added for inventory validation
 
 // Route to build inventory by classification view
-router.get("/type/:classificationId", invController.buildByClassificationId);
+router.get("/type/:classificationId", utilities.handleErrors(invController.buildByClassificationId));
 
 // Route for a specific vehicle detail page
-router.get('/detail/:vehicleId', invController.getVehicleDetail);  // Fixed the URL to `/detail/:vehicleId`
+router.get('/detail/:vehicleId', utilities.handleErrors(invController.getVehicleDetail));
 
-// route for inventory management view
+// Route for inventory management view
 router.get("/", utilities.handleErrors(invController.buildManagementView));
 
-// Show form
+// Show Add Classification Form
 router.get("/add-classification", utilities.handleErrors(invController.showAddClassificationForm));
 
-// Process form submission
+// Process Classification Form Submission
 router.post(
   "/add-classification",
-  classValidate.classificationRules(),      // validation rules
-  classValidate.checkClassificationData,    // error handler middleware
+  classValidate.classificationRules(),
+  classValidate.checkClassificationData,
   utilities.handleErrors(invController.addClassification)
 );
 
-module.exports = router;
+// Show Add Inventory Form
+router.get(
+  "/add-inventory",
+  utilities.handleErrors(invController.showAddInventoryForm)
+);
 
+// Handle Inventory Form Submission
+router.post(
+  "/add-inventory",
+  inventoryValidation.inventoryRules(),
+  inventoryValidation.checkInventoryData,
+  utilities.handleErrors(invController.addInventory)
+);
+
+module.exports = router;

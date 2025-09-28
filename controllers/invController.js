@@ -55,18 +55,18 @@ invCont.buildManagementView = async function (req, res) {
   });
 };
 
-
-// Show form
+// Show Add Classification Form
 invCont.showAddClassificationForm = async function (req, res) {
   const nav = await utilities.getNav();
   res.render("inventory/add-classification", {
     title: "Add New Classification",
     nav,
-    message: req.flash("message")
+    message: req.flash("message"),
+    errors: null
   });
 };
 
-// Handle POST
+// Handle Classification POST
 invCont.addClassification = async function (req, res) {
   const { classification_name } = req.body;
   const nav = await utilities.getNav();
@@ -103,7 +103,71 @@ invCont.addClassification = async function (req, res) {
   }
 };
 
+// Show Add Inventory Form
+invCont.showAddInventoryForm = async function (req, res) {
+  const nav = await utilities.getNav();
+  const classificationList = await utilities.buildClassificationList();
+
+  res.render("inventory/add-inventory", {
+    title: "Add New Inventory",
+    nav,
+    classificationList,
+    errors: null,
+    message: req.flash("message"),
+    formData: {}, // empty form to start
+  });
+};
+
+
+invCont.addInventory = async function (req, res) {
+  const nav = await utilities.getNav();
+  const {
+    classification_id,
+    inv_make,
+    inv_model,
+    inv_year,
+    inv_description,
+    inv_image,
+    inv_thumbnail,
+    inv_price,
+    inv_miles,
+    inv_color
+  } = req.body;
+
+  const formData = {
+    classification_id,
+    inv_make,
+    inv_model,
+    inv_year,
+    inv_description,
+    inv_image,
+    inv_thumbnail,
+    inv_price,
+    inv_miles,
+    inv_color
+  };
+
+  try {
+    const addResult = await invModel.addInventoryItem(formData);
+    if (addResult) {
+      req.flash("message", "Vehicle successfully added!");
+      res.redirect("/inv");
+    } else {
+      throw new Error("Insert failed");
+    }
+  } catch (err) {
+    const classificationList = await utilities.buildClassificationList(classification_id);
+    res.render("inventory/add-inventory", {
+      title: "Add New Inventory",
+      nav,
+      classificationList,
+      message: req.flash("message"),
+      errors: [{ msg: "Failed to add vehicle." }],
+      formData
+    });
+  }
+};
+
+
+
 module.exports = invCont;
-
-
-
