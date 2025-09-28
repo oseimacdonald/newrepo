@@ -31,9 +31,8 @@ app.use(session({
     pool,
   }),
   secret: process.env.SESSION_SECRET,
-  resave: true,
-  saveUninitialized: true,
-  name: 'sessionId',
+  resave: false,
+  saveUninitialized: true
 }))
 
 
@@ -60,7 +59,7 @@ app.use(express.urlencoded({ extended: true }));
  *************************/
 app.set("view engine", "ejs")
 app.use(expressLayouts)
-app.set("layout", "./layouts/layout") /* not at views root */
+app.set("layout", "layouts/layout") /* not at views root */
 
 /* ***********************
  * Routes

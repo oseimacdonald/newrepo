@@ -1,30 +1,12 @@
-<main class="management-main">
-    <div class="container">
-        <h1>Inventory Management</h1>
-        
-        <!-- Flash Messages -->
-        <% if (messages && messages.length > 0) { %>
-            <div class="flash-messages">
-                <% messages.forEach(message => { %>
-                    <div class="flash-message <%= message.type %>">
-                        <%= message.msg %>
-                    </div>
-                <% }) %>
-            </div>
-        <% } %>
+<main>
+  <h1>Inventory Management</h1>
 
-        <div class="management-links">
-            <div class="management-card">
-                <h2>Classification Management</h2>
-                <p>Add new vehicle classifications</p>
-                <a href="/inv/add-classification" class="btn btn-primary">Add Classification</a>
-            </div>
-            
-            <div class="management-card">
-                <h2>Inventory Management</h2>
-                <p>Add new vehicles to inventory</p>
-                <a href="/inv/add-inventory" class="btn btn-primary">Add Vehicle</a>
-            </div>
-        </div>
-    </div>
+  <% if (message) { %>
+    <div class="flash-message"><%= message %></div>
+  <% } %>
+
+  <ul>
+    <li><a href="/inv/add-classification">Add New Classification</a></li>
+    <li><a href="/inv/add-inventory">Add New Inventory</a></li>
+  </ul>
 </main>

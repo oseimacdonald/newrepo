@@ -1,36 +1,24 @@
-<main class="form-main">
-    <div class="container">
-        <h1>Add New Classification</h1>
-        
-        <!-- Flash Messages -->
-        <% if (messages && messages.length > 0) { %>
-            <div class="flash-messages">
-                <% messages.forEach(message => { %>
-                    <div class="flash-message <%= message.type %>">
-                        <%= message.msg %>
-                    </div>
-                <% }) %>
-            </div>
-        <% } %>
+<h1>Add New Classification</h1>
 
-        <form action="/inv/add-classification" method="post" class="classification-form">
-            <div class="form-group">
-                <label for="classification_name">Classification Name:</label>
-                <input type="text" name="classification_name" id="classification_name" 
-                        required pattern="^[a-zA-Z0-9]+$" 
-                        title="No spaces or special characters allowed">
-                <small class="form-text">Classification name cannot contain spaces or special characters</small>
-            </div>
-            
-            <% if (errors && errors.length > 0) { %>
-                <div class="error-messages">
-                    <% errors.forEach(error => { %>
-                        <div class="error-message"><%= error.msg %></div>
-                    <% }) %>
-                </div>
-            <% } %>
-            
-            <button type="submit" class="btn btn-primary">Add Classification</button>
-        </form>
-    </div>
-</main>
+<% if (message) { %>
+  <div class="flash-message error"><%= message %></div>
+<% } %>
+
+<form action="/inv/add-classification" method="POST" id="add-classification-form">
+  <label for="classification_name">Classification Name</label>
+  <input 
+    type="text" 
+    id="classification_name" 
+    name="classification_name" 
+    required 
+    pattern="^[A-Za-z0-9]+$" 
+    title="Classification name must not contain spaces or special characters."
+    value="<%= typeof classification_name !== 'undefined' ? classification_name : '' %>"
+  />
+
+  <% if (errors && errors.classification_name) { %>
+    <span class="field-error"><%= errors.classification_name.msg %></span>
+  <% } %>
+
+  <button type="submit">Add Classification</button>
+</form>

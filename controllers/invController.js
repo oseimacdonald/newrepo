@@ -40,10 +40,70 @@ invCont.getVehicleDetail = async (req, res) => {
       res.status(404).send('Vehicle not found');
     }
   } catch (error) {
-    console.error("Error fetching vehicle details:", error); /* for visibility */
+    console.error("Error fetching vehicle details:", error);
     res.status(500).send('Error fetching vehicle details');
   }
 };
 
+// Management view control
+invCont.buildManagementView = async function (req, res) {
+  let nav = await utilities.getNav(); 
+  res.render("inventory/management", {
+    title: "Inventory Management",
+    nav,
+    message: req.flash("message"), // this enables message display
+  });
+};
 
-module.exports = invCont
+
+// Show form
+invCont.showAddClassificationForm = async function (req, res) {
+  const nav = await utilities.getNav();
+  res.render("inventory/add-classification", {
+    title: "Add New Classification",
+    nav,
+    message: req.flash("message")
+  });
+};
+
+// Handle POST
+invCont.addClassification = async function (req, res) {
+  const { classification_name } = req.body;
+  const nav = await utilities.getNav();
+
+  try {
+    const result = await invModel.addClassification(classification_name);
+
+    if (result) {
+      req.flash("message", "New classification added successfully.");
+      const updatedNav = await utilities.getNav(); // reflect new nav
+      res.render("inventory/management", {
+        title: "Inventory Management",
+        nav: updatedNav,
+        message: req.flash("message")
+      });
+    } else {
+      req.flash("message", "Failed to add classification.");
+      res.status(500).render("inventory/add-classification", {
+        title: "Add New Classification",
+        nav,
+        message: req.flash("message"),
+        classification_name
+      });
+    }
+  } catch (err) {
+    console.error("Add classification error:", err);
+    req.flash("message", "An error occurred.");
+    res.status(500).render("inventory/add-classification", {
+      title: "Add New Classification",
+      nav,
+      message: req.flash("message"),
+      classification_name
+    });
+  }
+};
+
+module.exports = invCont;
+
+
+

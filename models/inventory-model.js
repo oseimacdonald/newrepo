@@ -42,5 +42,18 @@ async function getVehicleById(vehicleId) {
   }
 }
 
+async function addClassification(classification_name) {
+  try {
+    const sql = "INSERT INTO classification (classification_name) VALUES ($1)";
+    const data = await pool.query(sql, [classification_name]);
+    return data.rowCount;
+  } catch (error) {
+    console.error("Error inserting classification:", error);
+    throw error;
+  }
+}
 
-module.exports = {getClassifications, getInventoryByClassificationId, getVehicleById};
+
+module.exports = {getClassifications, getInventoryByClassificationId, getVehicleById, addClassification};
+
+
