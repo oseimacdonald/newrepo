@@ -1,117 +1,204 @@
 <main class="form-main">
-  <div class="container">
-    <h1>Add New Vehicle</h1>
+    <div class="container">
+        <h1>Add New Vehicle</h1>
 
-    <!-- Flash Messages -->
-    <% if (message && message.length > 0) { %>
-      <div class="flash-message"><%= message %></div>
-    <% } %>
+        <form action="/inv/add-inventory" method="POST" class="inventory-form" id="registrationForm" <%= errors ? "novalidate" : "" %>>
+          <input type="hidden" name="novalidate" value="<%= errors ? 'true' : 'false' %>">
 
-    <form action="/inv/add-inventory" method="POST" class="inventory-form" novalidate>
-      <!-- Classification Field -->
-      <div class="form-group">
-        <label for="classificationList">Classification</label>
-        <%- classificationList %>
-        <% if (errors && errors.classification_id) { %>
-          <span class="field-error"><%= errors.classification_id.msg %></span>
-        <% } %>
-      </div>
+  
+            <!-- Success Messages Only -->
+            <% if (message && message.length) { %>
+            <div class="flash-message">
+                <% message.forEach(function(msg) { %>
+                <p><%= msg %></p>
+                <% }) %>
+            </div>
+            <% } %>
 
-      <!-- Make and Model -->
-      <div class="form-row">
-        <div class="form-group">
-          <label for="inv_make">Make</label>
-          <input type="text" name="inv_make" id="inv_make" required 
-                 value="<%= formData.inv_make || '' %>">
-          <% if (errors && errors.inv_make) { %>
-            <span class="field-error"><%= errors.inv_make.msg %></span>
-          <% } %>
-        </div>
+            <!-- Server-side Validation Errors - INITIALLY HIDDEN -->
+            <div id="server-errors-container" style="display: none;">
+                <% if (errors && Object.keys(errors).length > 0) { %>
+                <div class="error-messages">
+                    <p class="error-title">Please correct the following errors:</p>
+                    <ul class="error-list">
+                        <% Object.values(errors).forEach(error => { %>
+                            <li><%= error.msg %></li>
+                        <% }) %>
+                    </ul>
+                </div>
+                <% } %>
+            </div>
 
-        <div class="form-group">
-          <label for="inv_model">Model</label>
-          <input type="text" name="inv_model" id="inv_model" required 
-                 value="<%= formData.inv_model || '' %>">
-          <% if (errors && errors.inv_model) { %>
-            <span class="field-error"><%= errors.inv_model.msg %></span>
-          <% } %>
-        </div>
-      </div>
+            <!-- Classification Field -->
+            <div class="form-group">
+                <label for="classificationList">Classification</label>
+                <%- classificationList %>
+                <span class="field-error" data-field="classification_id" style="display: none;">
+                    <% if (errors && errors.classification_id) { %>
+                        <%= errors.classification_id.msg %>
+                    <% } %>
+                </span>
+            </div>
 
-      <!-- Year and Color -->
-      <div class="form-row">
-        <div class="form-group">
-          <label for="inv_year">Year</label>
-          <input type="number" name="inv_year" id="inv_year" required 
-                 value="<%= formData.inv_year || '' %>"
-                 min="1900" max="<%= new Date().getFullYear() + 1 %>">
-          <% if (errors && errors.inv_year) { %>
-            <span class="field-error"><%= errors.inv_year.msg %></span>
-          <% } %>
-        </div>
+            <!-- Make and Model -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inv_make">Make</label>
+                    <input type="text" name="inv_make" id="inv_make" required 
+                           value="<%= formData.inv_make || '' %>">
+                    <span class="field-error" data-field="inv_make" style="display: none;">
+                        <% if (errors && errors.inv_make) { %>
+                            <%= errors.inv_make.msg %>
+                        <% } %>
+                    </span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inv_model">Model</label>
+                    <input type="text" name="inv_model" id="inv_model" required 
+                           value="<%= formData.inv_model || '' %>">
+                    <span class="field-error" data-field="inv_model" style="display: none;">
+                        <% if (errors && errors.inv_model) { %>
+                            <%= errors.inv_model.msg %>
+                        <% } %>
+                    </span>
+                </div>
+            </div>
 
-        <div class="form-group">
-          <label for="inv_color">Color</label>
-          <input type="text" name="inv_color" id="inv_color" required 
-                 value="<%= formData.inv_color || '' %>">
-          <% if (errors && errors.inv_color) { %>
-            <span class="field-error"><%= errors.inv_color.msg %></span>
-          <% } %>
-        </div>
-      </div>
+            <!-- Year and Color -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inv_year">Year</label>
+                    <input type="number" name="inv_year" id="inv_year" required 
+                           value="<%= formData.inv_year || '' %>"
+                           min="1900" max="<%= new Date().getFullYear() + 1 %>">
+                    <span class="field-error" data-field="inv_year" style="display: none;">
+                        <% if (errors && errors.inv_year) { %>
+                            <%= errors.inv_year.msg %>
+                        <% } %>
+                    </span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inv_color">Color</label>
+                    <input type="text" name="inv_color" id="inv_color" required 
+                           value="<%= formData.inv_color || '' %>">
+                    <span class="field-error" data-field="inv_color" style="display: none;">
+                        <% if (errors && errors.inv_color) { %>
+                            <%= errors.inv_color.msg %>
+                        <% } %>
+                    </span>
+                </div>
+            </div>
 
-      <!-- Description -->
-      <div class="form-group">
-        <label for="inv_description">Description</label>
-        <textarea name="inv_description" id="inv_description" required><%= formData.inv_description || '' %></textarea>
-        <% if (errors && errors.inv_description) { %>
-          <span class="field-error"><%= errors.inv_description.msg %></span>
-        <% } %>
-      </div>
+            <!-- Description -->
+            <div class="form-group">
+                <label for="inv_description">Description</label>
+                <textarea name="inv_description" id="inv_description" required><%= formData.inv_description || '' %></textarea>
+                <span class="field-error" data-field="inv_description" style="display: none;">
+                    <% if (errors && errors.inv_description) { %>
+                        <%= errors.inv_description.msg %>
+                    <% } %>
+                </span>
+            </div>
 
-      <!-- Image Paths -->
-      <div class="form-row">
-        <div class="form-group">
-          <label for="inv_image">Image Path</label>
-          <input type="text" name="inv_image" id="inv_image" required 
-                 value="<%= formData.inv_image || '/images/vehicles/no-image.png' %>">
-          <% if (errors && errors.inv_image) { %>
-            <span class="field-error"><%= errors.inv_image.msg %></span>
-          <% } %>
-        </div>
+            <!-- Image Paths -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inv_image">Image Path</label>
+                    <input type="text" name="inv_image" id="inv_image" required 
+                           value="<%= formData.inv_image || '/images/vehicles/no-image.png' %>">
+                    <span class="field-error" data-field="inv_image" style="display: none;">
+                        <% if (errors && errors.inv_image) { %>
+                            <%= errors.inv_image.msg %>
+                        <% } %>
+                    </span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inv_thumbnail">Thumbnail Path</label>
+                    <input type="text" name="inv_thumbnail" id="inv_thumbnail" required 
+                           value="<%= formData.inv_thumbnail || '/images/vehicles/no-image-tn.png' %>">
+                    <span class="field-error" data-field="inv_thumbnail" style="display: none;">
+                        <% if (errors && errors.inv_thumbnail) { %>
+                            <%= errors.inv_thumbnail.msg %>
+                        <% } %>
+                    </span>
+                </div>
+            </div>
 
-        <div class="form-group">
-          <label for="inv_thumbnail">Thumbnail Path</label>
-          <input type="text" name="inv_thumbnail" id="inv_thumbnail" required 
-                 value="<%= formData.inv_thumbnail || '/images/vehicles/no-image-tn.png' %>">
-          <% if (errors && errors.inv_thumbnail) { %>
-            <span class="field-error"><%= errors.inv_thumbnail.msg %></span>
-          <% } %>
-        </div>
-      </div>
+            <!-- Price and Mileage -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inv_price">Price</label>
+                    <input type="number" step="0.01" name="inv_price" id="inv_price" required 
+                           value="<%= formData.inv_price || '' %>" min="0">
+                    <span class="field-error" data-field="inv_price" style="display: none;">
+                        <% if (errors && errors.inv_price) { %>
+                            <%= errors.inv_price.msg %>
+                        <% } %>
+                    </span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inv_miles">Mileage</label>
+                    <input type="number" name="inv_miles" id="inv_miles" required 
+                           value="<%= formData.inv_miles || '' %>" min="0">
+                    <span class="field-error" data-field="inv_miles" style="display: none;">
+                        <% if (errors && errors.inv_miles) { %>
+                            <%= errors.inv_miles.msg %>
+                        <% } %>
+                    </span>
+                </div>
+            </div>
 
-      <!-- Price and Mileage -->
-      <div class="form-row">
-        <div class="form-group">
-          <label for="inv_price">Price</label>
-          <input type="number" step="0.01" name="inv_price" id="inv_price" required 
-                 value="<%= formData.inv_price || '' %>" min="0">
-          <% if (errors && errors.inv_price) { %>
-            <span class="field-error"><%= errors.inv_price.msg %></span>
-          <% } %>
-        </div>
-
-        <div class="form-group">
-          <label for="inv_miles">Mileage</label>
-          <input type="number" name="inv_miles" id="inv_miles" required 
-                 value="<%= formData.inv_miles || '' %>" min="0">
-          <% if (errors && errors.inv_miles) { %>
-            <span class="field-error"><%= errors.inv_miles.msg %></span>
-          <% } %>
-        </div>
-      </div>
-
-      <button type="submit" class="btn btn-primary">Add Vehicle</button>
-    </form>
-  </div>
+            <button type="submit" class="btn btn-primary">Add Vehicle</button>
+        </form>
+    </div>
 </main>
+
+<!--
+<script>
+// IMMEDIATELY hide server errors and only show if novalidate is present
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registrationForm');
+    
+    // Check if novalidate attribute exists
+    const hasNovalidate = form.hasAttribute('novalidate');
+    
+    if (hasNovalidate) {
+        // SHOW server errors when novalidate is present
+        const serverErrorsContainer = document.getElementById('server-errors-container');
+        if (serverErrorsContainer) {
+            serverErrorsContainer.style.display = 'block';
+        }
+        
+        // Show all field errors
+        const fieldErrors = document.querySelectorAll('.field-error');
+        fieldErrors.forEach(error => {
+            // Only show if it has content
+            if (error.textContent.trim() !== '') {
+                error.style.display = 'block';
+            }
+        });
+        
+        // Add error classes to inputs that have errors
+        fieldErrors.forEach(error => {
+            if (error.textContent.trim() !== '') {
+                const fieldName = error.getAttribute('data-field');
+                const input = form.querySelector(`[name="${fieldName}"]`);
+                if (input) {
+                    input.classList.add('error');
+                }
+            }
+        });
+        
+        console.log('Server-side mode: Errors visible');
+    } else {
+        // KEEP errors hidden when novalidate is NOT present
+        console.log('Client-side mode: Errors hidden');
+    }
+});
+</script>
+
+-->

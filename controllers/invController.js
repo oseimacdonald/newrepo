@@ -1,28 +1,26 @@
-const invModel = require("../models/inventory-model")
-const utilities = require("../utilities/")
+const { validationResult } = require("express-validator");
+const invModel = require("../models/inventory-model");
+const utilities = require("../utilities");
 
-const invCont = {}
+const invCont = {};
 
-/* ***************************
- *  Build inventory by classification view
- * ************************** */
-invCont.buildByClassificationId = async function (req, res, next) {
-  const classification_id = req.params.classificationId
-  const data = await invModel.getInventoryByClassificationId(classification_id)
-  const grid = await utilities.buildClassificationGrid(data)
-  let nav = await utilities.getNav()
-  const className = data[0].classification_name
+// Build inventory by classification
+invCont.buildByClassificationId = async function (req, res) {
+  const classification_id = req.params.classificationId;
+  const data = await invModel.getInventoryByClassificationId(classification_id);
+  const grid = await utilities.buildClassificationGrid(data);
+  const nav = await utilities.getNav();
+  const className = data.length > 0 ? data[0].classification_name : "Vehicles";
+
   res.render("./inventory/classification", {
-    title: className + " vehicles",
+    title: `${className} vehicles`,
     nav,
     grid,
-  })
-}
+  });
+};
 
-/* *******************************************************
-*  Controller function to fetch and render the vehicle detail view
-*  ****************************************************** */
-invCont.getVehicleDetail = async (req, res) => {
+// Get vehicle detail
+invCont.getVehicleDetail = async function (req, res) {
   const vehicleId = req.params.vehicleId;
 
   try {
@@ -30,43 +28,42 @@ invCont.getVehicleDetail = async (req, res) => {
 
     if (vehicleData) {
       const nav = await utilities.getNav();
-
-      res.render('inventory/vehicle-detail', {
+      res.render("inventory/vehicle-detail", {
         title: `${vehicleData.inv_make} ${vehicleData.inv_model}`,
         nav,
-        vehicleData
+        vehicleData,
       });
     } else {
-      res.status(404).send('Vehicle not found');
+      res.status(404).send("Vehicle not found");
     }
   } catch (error) {
     console.error("Error fetching vehicle details:", error);
-    res.status(500).send('Error fetching vehicle details');
+    res.status(500).send("Error fetching vehicle details");
   }
 };
 
-// Management view control
+// Inventory management view
 invCont.buildManagementView = async function (req, res) {
-  let nav = await utilities.getNav(); 
+  const nav = await utilities.getNav();
   res.render("inventory/management", {
     title: "Inventory Management",
     nav,
-    message: req.flash("message"), // this enables message display
+    message: req.flash("message"),
   });
 };
 
-// Show Add Classification Form
+// Show Add Classification form
 invCont.showAddClassificationForm = async function (req, res) {
   const nav = await utilities.getNav();
   res.render("inventory/add-classification", {
     title: "Add New Classification",
     nav,
     message: req.flash("message"),
-    errors: null
+    errors: null,
   });
 };
 
-// Handle Classification POST
+// Handle POST for Classification
 invCont.addClassification = async function (req, res) {
   const { classification_name } = req.body;
   const nav = await utilities.getNav();
@@ -75,16 +72,16 @@ invCont.addClassification = async function (req, res) {
     const result = await invModel.addClassification(classification_name);
 
     if (result) {
-      // Set flash message and redirect to /inv
       req.flash("message", "New classification added successfully.");
-      res.redirect("/inv"); // this will go to `buildManagementView`
+      res.redirect("/inv");
     } else {
       req.flash("message", "Failed to add classification.");
       res.status(500).render("inventory/add-classification", {
         title: "Add New Classification",
         nav,
         message: req.flash("message"),
-        classification_name
+        classification_name,
+        errors: null,
       });
     }
   } catch (err) {
@@ -94,85 +91,104 @@ invCont.addClassification = async function (req, res) {
       title: "Add New Classification",
       nav,
       message: req.flash("message"),
-      classification_name
+      classification_name,
+      errors: null,
     });
   }
 };
 
-// Show Add Inventory Form
+// Show Add Inventory Form (GET)
 invCont.showAddInventoryForm = async function (req, res) {
   const nav = await utilities.getNav();
   const classificationList = await utilities.buildClassificationList();
 
   res.render("inventory/add-inventory", {
-    title: "Add New Inventory",
+    title: "Add New Vehicle",
     nav,
     classificationList,
     errors: null,
     message: req.flash("message"),
-    formData: {}, // empty form to start
+    formData: {},
   });
 };
 
-
+// Handle POST for adding new vehicle
 invCont.addInventory = async function (req, res) {
   const nav = await utilities.getNav();
-  const {
-    classification_id,
-    inv_make,
-    inv_model,
-    inv_year,
-    inv_description,
-    inv_image,
-    inv_thumbnail,
-    inv_price,
-    inv_miles,
-    inv_color
-  } = req.body;
+  const classificationList = await utilities.buildClassificationList();
+  const errors = validationResult(req);
 
   const formData = {
-    classification_id,
-    inv_make,
-    inv_model,
-    inv_year,
-    inv_description,
-    inv_image,
-    inv_thumbnail,
-    inv_price,
-    inv_miles,
-    inv_color
+    ...req.body,
   };
 
-  try {
-    const addResult = await invModel.addInventoryItem(formData);
-    if (addResult) {
-      req.flash("message", "Vehicle successfully added!");
-      return res.redirect("/inv"); // redirect to management with flash
-    } else {
-      const classificationList = await utilities.buildClassificationList(classification_id);
-      return res.status(500).render("inventory/add-inventory", {
-        title: "Add New Inventory",
-        nav,
-        classificationList,
-        message: "Failed to add vehicle",
-        errors: {},
-        formData
-      });
-    }
-  } catch (err) {
-    console.error("Add inventory error:", err);
-    const classificationList = await utilities.buildClassificationList(classification_id);
-    return res.status(500).render("inventory/add-inventory", {
-      title: "Add New Inventory",
+  // Check for novalidate attribute from client side
+  const isNovalidate = req.body.novalidate === "true";
+
+  if (!errors.isEmpty()) {
+    return res.status(400).render("inventory/add-inventory", {
+      title: "Add New Vehicle",
       nav,
       classificationList,
-      message: "An error occurred while adding the vehicle.",
-      errors: {},
-      formData
+      message: isNovalidate ? ["Please fix the errors below."] : null,
+      errors: isNovalidate ? errors.mapped() : null,
+      formData,
+    });
+  }
+
+  try {
+    const {
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_image,
+      inv_thumbnail,
+      inv_price,
+      inv_miles,
+      inv_color,
+      classification_id,
+    } = req.body;
+
+    const insertResult = await invModel.addVehicle({
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_image,
+      inv_thumbnail,
+      inv_price,
+      inv_miles,
+      inv_color,
+      classification_id,
+    });
+
+    if (insertResult) {
+      req.flash("message", "Vehicle successfully added.");
+      return res.redirect("/inv");
+    } else {
+      req.flash("message", "Failed to add vehicle.");
+      return res.status(500).render("inventory/add-inventory", {
+        title: "Add New Vehicle",
+        nav,
+        classificationList,
+        message: req.flash("message"),
+        errors: null,
+        formData,
+      });
+    }
+  } catch (error) {
+    console.error("Error adding vehicle:", error);
+    req.flash("message", "An internal error occurred.");
+    return res.status(500).render("inventory/add-inventory", {
+      title: "Add New Vehicle",
+      nav,
+      classificationList,
+      message: req.flash("message"),
+      errors: null,
+      formData,
     });
   }
 };
-
-
 
 module.exports = invCont;

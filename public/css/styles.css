@@ -973,3 +973,12 @@ footer {
     font-weight: bold;
 }
 
+/* Hide by default */
+.novalidate-only {
+  display: none;
+}
+
+/* Only show when form has novalidate */
+form[novalidate] .novalidate-only {
+  display: block;
+}
