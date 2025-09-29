@@ -18,6 +18,7 @@ const checkClassificationData = (req, res, next) => {
     res.render("inventory/add-classification", {
       title: "Add New Classification",
       nav,
+      message: null,
       errors: errors.mapped(),
       classification_name: req.body.classification_name,
     });

@@ -40,9 +40,9 @@ app.use(session({
 app.use(flash());
 
 
-// Express messages middleware
-app.use(function(req, res, next){
-  res.locals.messages = req.flash(); // This will give you access to flash messages
+// Express/Global messages middleware
+app.use((req, res, next) => {
+  res.locals.message = req.flash("message") || null; // This will give you access to flash messages
   next();
 })
 

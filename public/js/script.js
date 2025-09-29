@@ -79,5 +79,19 @@ function initializeRegistrationForm(form) {
         }
     };
 
-    // ... rest of your client-side validation functions
+
 }
+
+// Auto-dismiss flash messages after 5 seconds
+document.addEventListener("DOMContentLoaded", function () {
+  const flashMsg = document.querySelector(".flash-message");
+  if (flashMsg) {
+    setTimeout(() => {
+      flashMsg.classList.add("fade-out");
+      // Remove the element after fade-out
+      flashMsg.addEventListener("transitionend", () => {
+        flashMsg.remove();
+      });
+    }, 10000); // 5 seconds
+  }
+});

@@ -27,8 +27,8 @@ const checkInventoryData = async (req, res, next) => {
       title: "Add New Inventory",
       nav,
       classificationList,
-      message: req.flash("message"),
-      errors: errors.array(),
+      message: null,
+      errors: errors.mapped(),
       formData: req.body
     });
   }

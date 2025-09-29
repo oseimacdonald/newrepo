@@ -1,8 +1,12 @@
 <main>
   <h1>Inventory Management</h1>
 
-  <% if (message) { %>
-    <div class="flash-message"><%= message %></div>
+  <% if (message && message.length > 0) { %>
+    <% message.forEach(msg => { %>
+      <div class="flash-message <%= msg.toLowerCase().includes('success') ? 'success' : 'error' %>">
+        <%= msg %>
+      </div>
+    <% }) %>
   <% } %>
 
   <ul>

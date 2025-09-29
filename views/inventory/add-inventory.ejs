@@ -1,96 +1,117 @@
 <main class="form-main">
-    <div class="container">
-        <h1>Add New Vehicle</h1>
-        
-        <!-- Flash Messages -->
-        <% if (message && message.length > 0) { %>
-            <div class="flash-message"><%= message %></div>
+  <div class="container">
+    <h1>Add New Vehicle</h1>
+
+    <!-- Flash Messages -->
+    <% if (message && message.length > 0) { %>
+      <div class="flash-message"><%= message %></div>
+    <% } %>
+
+    <form action="/inv/add-inventory" method="POST" class="inventory-form" novalidate>
+      <!-- Classification Field -->
+      <div class="form-group">
+        <label for="classificationList">Classification</label>
+        <%- classificationList %>
+        <% if (errors && errors.classification_id) { %>
+          <span class="field-error"><%= errors.classification_id.msg %></span>
         <% } %>
+      </div>
 
-        <!-- Error Messages -->
-        <% if (errors && errors.length > 0) { %>
-            <ul class="errors">
-                <% errors.forEach(error => { %>
-                    <li><%= error.msg %></li>
-                <% }) %>
-            </ul>
+      <!-- Make and Model -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_make">Make</label>
+          <input type="text" name="inv_make" id="inv_make" required 
+                 value="<%= formData.inv_make || '' %>">
+          <% if (errors && errors.inv_make) { %>
+            <span class="field-error"><%= errors.inv_make.msg %></span>
+          <% } %>
+        </div>
+
+        <div class="form-group">
+          <label for="inv_model">Model</label>
+          <input type="text" name="inv_model" id="inv_model" required 
+                 value="<%= formData.inv_model || '' %>">
+          <% if (errors && errors.inv_model) { %>
+            <span class="field-error"><%= errors.inv_model.msg %></span>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Year and Color -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_year">Year</label>
+          <input type="number" name="inv_year" id="inv_year" required 
+                 value="<%= formData.inv_year || '' %>"
+                 min="1900" max="<%= new Date().getFullYear() + 1 %>">
+          <% if (errors && errors.inv_year) { %>
+            <span class="field-error"><%= errors.inv_year.msg %></span>
+          <% } %>
+        </div>
+
+        <div class="form-group">
+          <label for="inv_color">Color</label>
+          <input type="text" name="inv_color" id="inv_color" required 
+                 value="<%= formData.inv_color || '' %>">
+          <% if (errors && errors.inv_color) { %>
+            <span class="field-error"><%= errors.inv_color.msg %></span>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="inv_description">Description</label>
+        <textarea name="inv_description" id="inv_description" required><%= formData.inv_description || '' %></textarea>
+        <% if (errors && errors.inv_description) { %>
+          <span class="field-error"><%= errors.inv_description.msg %></span>
         <% } %>
+      </div>
 
-        <form action="/inv/add-inventory" method="POST" class="inventory-form">
-            <!-- Classification Field -->
-            <div class="form-group">
-                <label for="classificationList">Classification</label>
-                <%- classificationList %>
-            </div>
+      <!-- Image Paths -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_image">Image Path</label>
+          <input type="text" name="inv_image" id="inv_image" required 
+                 value="<%= formData.inv_image || '/images/vehicles/no-image.png' %>">
+          <% if (errors && errors.inv_image) { %>
+            <span class="field-error"><%= errors.inv_image.msg %></span>
+          <% } %>
+        </div>
 
-            <!-- Make and Model -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="inv_make">Make</label>
-                    <input type="text" name="inv_make" id="inv_make" required 
-                           value="<%= formData.inv_make || '' %>">
-                </div>
-                
-                <div class="form-group">
-                    <label for="inv_model">Model</label>
-                    <input type="text" name="inv_model" id="inv_model" required 
-                           value="<%= formData.inv_model || '' %>">
-                </div>
-            </div>
+        <div class="form-group">
+          <label for="inv_thumbnail">Thumbnail Path</label>
+          <input type="text" name="inv_thumbnail" id="inv_thumbnail" required 
+                 value="<%= formData.inv_thumbnail || '/images/vehicles/no-image-tn.png' %>">
+          <% if (errors && errors.inv_thumbnail) { %>
+            <span class="field-error"><%= errors.inv_thumbnail.msg %></span>
+          <% } %>
+        </div>
+      </div>
 
-            <!-- Year and Color -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="inv_year">Year</label>
-                    <input type="number" name="inv_year" id="inv_year" required 
-                           value="<%= formData.inv_year || '' %>"
-                           min="1900" max="<%= new Date().getFullYear() + 1 %>">
-                </div>
-                
-                <div class="form-group">
-                    <label for="inv_color">Color</label>
-                    <input type="text" name="inv_color" id="inv_color" required 
-                           value="<%= formData.inv_color || '' %>">
-                </div>
-            </div>
+      <!-- Price and Mileage -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inv_price">Price</label>
+          <input type="number" step="0.01" name="inv_price" id="inv_price" required 
+                 value="<%= formData.inv_price || '' %>" min="0">
+          <% if (errors && errors.inv_price) { %>
+            <span class="field-error"><%= errors.inv_price.msg %></span>
+          <% } %>
+        </div>
 
-            <!-- Description -->
-            <div class="form-group">
-                <label for="inv_description">Description</label>
-                <textarea name="inv_description" id="inv_description" required><%= formData.inv_description || '' %></textarea>
-            </div>
+        <div class="form-group">
+          <label for="inv_miles">Mileage</label>
+          <input type="number" name="inv_miles" id="inv_miles" required 
+                 value="<%= formData.inv_miles || '' %>" min="0">
+          <% if (errors && errors.inv_miles) { %>
+            <span class="field-error"><%= errors.inv_miles.msg %></span>
+          <% } %>
+        </div>
+      </div>
 
-            <!-- Image Paths -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="inv_image">Image Path</label>
-                    <input type="text" name="inv_image" id="inv_image" required 
-                           value="<%= formData.inv_image || '/images/vehicles/no-image.png' %>">
-                </div>
-                
-                <div class="form-group">
-                    <label for="inv_thumbnail">Thumbnail Path</label>
-                    <input type="text" name="inv_thumbnail" id="inv_thumbnail" required 
-                           value="<%= formData.inv_thumbnail || '/images/vehicles/no-image-tn.png' %>">
-                </div>
-            </div>
-
-            <!-- Price and Mileage -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="inv_price">Price</label>
-                    <input type="number" step="0.01" name="inv_price" id="inv_price" required 
-                           value="<%= formData.inv_price || '' %>" min="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="inv_miles">Mileage</label>
-                    <input type="number" name="inv_miles" id="inv_miles" required 
-                           value="<%= formData.inv_miles || '' %>" min="0">
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Add Vehicle</button>
-        </form>
-    </div>
+      <button type="submit" class="btn btn-primary">Add Vehicle</button>
+    </form>
+  </div>
 </main>

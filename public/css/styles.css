@@ -141,14 +141,17 @@
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 }
 
-/* Field error */
 .field-error {
-    color: #dc3545;
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
     font-size: 0.875rem;
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
     display: block;
-    min-height: 1.2em;
 }
+
 
 /* Password Requirements */
 .requirements {
@@ -969,5 +972,4 @@ footer {
     margin-right: 0.5rem;
     font-weight: bold;
 }
-
 
