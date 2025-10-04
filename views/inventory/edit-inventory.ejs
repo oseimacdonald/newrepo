@@ -1,13 +1,16 @@
 <main class="form-main">
     <div class="container">
-        <h1>Add New Vehicle</h1>
+        <!-- CHANGED: Title from "Add New Vehicle" to dynamic title -->
+        <h1><%= title %></h1>
 
-        <form action="/inv/add-inventory" method="POST" class="inventory-form" id="registrationForm" <%= errors ? "novalidate" : "" %>>
+        <!-- CHANGED: Form action from "/inv/add-inventory" to "/inv/update" -->
+        <form action="/inv/update" method="POST" class="inventory-form" id="registrationForm" <%= errors ? "novalidate" : "" %>>
           <input type="hidden" name="novalidate" value="<%= errors ? 'true' : 'false' %>">
+          
 
   
             <!-- Success Messages Only -->
-            <% if (message && message.length) { %>
+            <% if (typeof message !== 'undefined' && message && message.length) { %>
             <div class="flash-message">
                 <% message.forEach(function(msg) { %>
                 <p><%= msg %></p>
@@ -32,7 +35,8 @@
             <!-- Classification Field -->
             <div class="form-group">
                 <label for="classificationList">Classification</label>
-                <%- classificationList %>
+                <!-- CHANGED: classificationList to classificationSelect to match controller -->
+                <%- classificationSelect %>
                 <span class="field-error" data-field="classification_id" style="display: none;">
                     <% if (errors && errors.classification_id) { %>
                         <%= errors.classification_id.msg %>
@@ -44,8 +48,9 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="inv_make">Make</label>
+                    <!-- CHANGED: formData.inv_make to inv_make -->
                     <input type="text" name="inv_make" id="inv_make" required 
-                           value="<%= formData.inv_make || '' %>">
+                           value="<%= typeof inv_make !== 'undefined' ? inv_make : '' %>">
                     <span class="field-error" data-field="inv_make" style="display: none;">
                         <% if (errors && errors.inv_make) { %>
                             <%= errors.inv_make.msg %>
@@ -55,8 +60,9 @@
                 
                 <div class="form-group">
                     <label for="inv_model">Model</label>
+                    <!-- CHANGED: formData.inv_model to inv_model -->
                     <input type="text" name="inv_model" id="inv_model" required 
-                           value="<%= formData.inv_model || '' %>">
+                           value="<%= typeof inv_model !== 'undefined' ? inv_model : '' %>">
                     <span class="field-error" data-field="inv_model" style="display: none;">
                         <% if (errors && errors.inv_model) { %>
                             <%= errors.inv_model.msg %>
@@ -69,8 +75,9 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="inv_year">Year</label>
+                    <!-- CHANGED: formData.inv_year to inv_year -->
                     <input type="number" name="inv_year" id="inv_year" required 
-                           value="<%= formData.inv_year || '' %>"
+                           value="<%= typeof inv_year !== 'undefined' ? inv_year : '' %>"
                            min="1900" max="<%= new Date().getFullYear() + 1 %>">
                     <span class="field-error" data-field="inv_year" style="display: none;">
                         <% if (errors && errors.inv_year) { %>
@@ -81,8 +88,9 @@
                 
                 <div class="form-group">
                     <label for="inv_color">Color</label>
+                    <!-- CHANGED: formData.inv_color to inv_color -->
                     <input type="text" name="inv_color" id="inv_color" required 
-                           value="<%= formData.inv_color || '' %>">
+                           value="<%= typeof inv_color !== 'undefined' ? inv_color : '' %>">
                     <span class="field-error" data-field="inv_color" style="display: none;">
                         <% if (errors && errors.inv_color) { %>
                             <%= errors.inv_color.msg %>
@@ -94,7 +102,8 @@
             <!-- Description -->
             <div class="form-group">
                 <label for="inv_description">Description</label>
-                <textarea name="inv_description" id="inv_description" required><%= formData.inv_description || '' %></textarea>
+                <!-- CHANGED: formData.inv_description to inv_description -->
+                <textarea name="inv_description" id="inv_description" required><%= typeof inv_description !== 'undefined' ? inv_description : '' %></textarea>
                 <span class="field-error" data-field="inv_description" style="display: none;">
                     <% if (errors && errors.inv_description) { %>
                         <%= errors.inv_description.msg %>
@@ -106,8 +115,9 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="inv_image">Image Path</label>
+                    <!-- CHANGED: formData.inv_image to inv_image -->
                     <input type="text" name="inv_image" id="inv_image" required 
-                           value="<%= formData.inv_image || '/images/vehicles/no-image.png' %>">
+                           value="<%= typeof inv_image !== 'undefined' ? inv_image : '/images/vehicles/no-image.png' %>">
                     <span class="field-error" data-field="inv_image" style="display: none;">
                         <% if (errors && errors.inv_image) { %>
                             <%= errors.inv_image.msg %>
@@ -117,8 +127,9 @@
                 
                 <div class="form-group">
                     <label for="inv_thumbnail">Thumbnail Path</label>
+                    <!-- CHANGED: formData.inv_thumbnail to inv_thumbnail -->
                     <input type="text" name="inv_thumbnail" id="inv_thumbnail" required 
-                           value="<%= formData.inv_thumbnail || '/images/vehicles/no-image-tn.png' %>">
+                           value="<%= typeof inv_thumbnail !== 'undefined' ? inv_thumbnail : '/images/vehicles/no-image-tn.png' %>">
                     <span class="field-error" data-field="inv_thumbnail" style="display: none;">
                         <% if (errors && errors.inv_thumbnail) { %>
                             <%= errors.inv_thumbnail.msg %>
@@ -131,8 +142,9 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="inv_price">Price</label>
+                    <!-- CHANGED: formData.inv_price to inv_price -->
                     <input type="number" step="0.01" name="inv_price" id="inv_price" required 
-                           value="<%= formData.inv_price || '' %>" min="0">
+                           value="<%= typeof inv_price !== 'undefined' ? inv_price : '' %>" min="0">
                     <span class="field-error" data-field="inv_price" style="display: none;">
                         <% if (errors && errors.inv_price) { %>
                             <%= errors.inv_price.msg %>
@@ -142,8 +154,9 @@
                 
                 <div class="form-group">
                     <label for="inv_miles">Mileage</label>
+                    <!-- CHANGED: formData.inv_miles to inv_miles -->
                     <input type="number" name="inv_miles" id="inv_miles" required 
-                           value="<%= formData.inv_miles || '' %>" min="0">
+                           value="<%= typeof inv_miles !== 'undefined' ? inv_miles : '' %>" min="0">
                     <span class="field-error" data-field="inv_miles" style="display: none;">
                         <% if (errors && errors.inv_miles) { %>
                             <%= errors.inv_miles.msg %>
@@ -152,8 +165,13 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">Add Vehicle</button>
+            <!-- CHANGED: Button text from "Add Vehicle" to "Update Vehicle" -->
+            <button type="submit" class="btn btn-primary">Update Vehicle</button>
+
+            <!-- ADDED: Hidden field for inventory ID -->
+            <input type="hidden" name="inv_id"
+            <% if(locals.inv_id) { %> value="<%= locals.inv_id %>"
+            <% } %>>
         </form>
     </div>
 </main>
-

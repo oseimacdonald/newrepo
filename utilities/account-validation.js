@@ -1,4 +1,4 @@
-const utilities = require(".")  // Fixed import path
+const utilities = require(".")  
 const { body, validationResult } = require("express-validator")
 
 const validate = {}
@@ -38,8 +38,25 @@ validate.registrationRules = () => {
     ]
 }
 
+/* **********************************
+ *  Login Data Validation Rules
+ * ********************************* */
+validate.loginRules = () => {
+    return [
+        body("account_email")
+            .trim()
+            .escape()
+            .isEmail()
+            .withMessage("A valid email is required."),
+
+        body("account_password")
+            .notEmpty()
+            .withMessage("Password is required."),
+    ]
+}
+
 /* ******************************
- * Check data and return errors or continue to registration
+ * Check registration data and return errors or continue to registration
  * ***************************** */
 validate.checkRegData = async (req, res, next) => {
     const errors = validationResult(req)
@@ -54,6 +71,26 @@ validate.checkRegData = async (req, res, next) => {
             nav,
             account_firstname: account_firstname || '',
             account_lastname: account_lastname || '',
+            account_email: account_email || ''
+        })
+    }
+    next()
+}
+
+/* ******************************
+ * Check login data and return errors or continue to login
+ * ***************************** */
+validate.checkLoginData = async (req, res, next) => {
+    const errors = validationResult(req)
+    
+    if (!errors.isEmpty()) {
+        const { account_email } = req.body
+        const nav = await utilities.getNav()
+        
+        return res.render("account/login", {
+            errors,
+            title: "Login",
+            nav,
             account_email: account_email || ''
         })
     }

@@ -6,6 +6,9 @@ const regValidate = require('../utilities/account-validation')
 
 router.get("/login", utilities.handleErrors(accountController.buildLogin))
 router.get("/register", utilities.handleErrors(accountController.buildRegister))
+// ADD THIS ROUTE - Account Management with login check
+router.get("/", utilities.checkLogin, utilities.handleErrors(accountController.buildManagement))
+
 
 router.post(
     "/register",
@@ -14,6 +17,10 @@ router.post(
     utilities.handleErrors(accountController.registerAccount)
 )
 
-router.post("/login", utilities.handleErrors(accountController.accountLogin))
+router.post(
+    "/login",
+    regValidate.loginRules(),
+    regValidate.checkLoginData,
+    utilities.handleErrors(accountController.accountLogin))
 
 module.exports = router

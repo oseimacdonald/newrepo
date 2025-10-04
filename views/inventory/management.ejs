@@ -1,16 +1,55 @@
 <main>
-  <h1>Inventory Management</h1>
+  <div class="container">
+    <h1>Inventory Management</h1>
 
-  <% if (message && message.length > 0) { %>
-    <% message.forEach(msg => { %>
-      <div class="flash-message <%= msg.toLowerCase().includes('success') ? 'success' : 'error' %>">
-        <%= msg %>
+    <!-- Display flash messages - SAFER VERSION -->
+    <% if (successMessage) { %>
+      <div class="flash-message success">
+        <%= successMessage %>
       </div>
-    <% }) %>
-  <% } %>
+    <% } %>
+    
+    <!-- Display errors -->
+    <% if (errors && errors.length > 0) { %>
+      <div class="flash-message error">
+        <ul>
+          <% errors.forEach(error => { %>
+            <li><%= error.msg %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
 
-  <ul>
-    <li><a href="/inv/add-classification">Add New Classification</a></li>
-    <li><a href="/inv/add-inventory">Add New Inventory</a></li>
-  </ul>
+    <!-- Original flash messages -->
+    <% if (message && message.length > 0) { %>
+      <% message.forEach(msg => { %>
+        <div class="flash-message <%= msg.toLowerCase().includes('success') ? 'success' : 'error' %>">
+          <%= msg %>
+        </div>
+      <% }) %>
+    <% } %>
+
+    <div class="management-content">
+      <p>You're logged in</p>
+      
+      <h2>Select An Action</h2>
+      <ul>
+        <li><a href="/inv/add-classification">Add New Classification</a></li>
+        <li><a href="/inv/add-inventory">Add New Inventory</a></li>
+      </ul>
+
+      <!-- ADDED: Manage Inventory Section -->
+      <h2>Manipulate Inventory</h2>
+      <p>Select a classification from the list to see the items belonging to that class.</p>
+      
+      <!-- ADDED: Classification Select List -->
+      <%- classificationSelect %>
+      
+      <!-- ADDED: Empty table for inventory display -->
+      <table id="inventoryDisplay"></table>
+      <noscript>JavaScript must be enabled to use this page.</noscript>
+    </div>
+  </div>
+
+  <script src="../../js/inventory.js"></script>  
 </main>

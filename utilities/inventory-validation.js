@@ -62,4 +62,50 @@ const checkInventoryData = async (req, res, next) => {
   next();
 };
 
-module.exports = { inventoryRules, checkInventoryData };
+/* ******************************
+ * Check data and return errors or continue to update
+ * ***************************** */
+const checkUpdateData = async (req, res, next) => {
+  console.log("checkUpdateData middleware hit");
+  const errors = validationResult(req);
+  
+  if (!errors.isEmpty()) {
+    const nav = await utilities.getNav();
+    const classificationSelect = await utilities.buildClassificationList(
+      req.body.classification_id
+    );
+    
+    // Extract individual fields from request body
+    const { 
+      inv_id, inv_make, inv_model, inv_year, inv_description, 
+      inv_image, inv_thumbnail, inv_price, inv_miles, inv_color, 
+      classification_id 
+    } = req.body;
+
+    const itemName = `${inv_make} ${inv_model}`;
+
+    return res.status(400).render("inventory/edit-inventory", {
+      title: "Edit " + itemName,
+      nav,
+      classificationSelect,
+      message: null,
+      errors: errors.mapped(),
+      inv_id,
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_image,
+      inv_thumbnail,
+      inv_price,
+      inv_miles,
+      inv_color,
+      classification_id,
+      novalidate: true
+    });
+  }
+
+  next();
+};
+
+module.exports = { inventoryRules, checkInventoryData, checkUpdateData };

@@ -8,8 +8,12 @@ const classValidate = require("../utilities/classification-validation");
 // Import inventory validation
 const {
   inventoryRules,
-  checkInventoryData
+  checkInventoryData,
+  checkUpdateData  // ADDED: Import checkUpdateData
 } = require("../utilities/inventory-validation");
+
+// Default inventory route
+router.get("/", utilities.handleErrors(invController.buildManagement));
 
 // Route to build inventory by classification view
 router.get("/type/:classificationId", utilities.handleErrors(invController.buildByClassificationId));
@@ -18,7 +22,20 @@ router.get("/type/:classificationId", utilities.handleErrors(invController.build
 router.get('/detail/:vehicleId', utilities.handleErrors(invController.getVehicleDetail));
 
 // Route for inventory management view
-router.get("/", utilities.handleErrors(invController.buildManagementView));
+router.get("/management", utilities.handleErrors(invController.buildManagement));
+
+// Route to get inventory data for management (AJAX)
+router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON));
+
+// Route to show edit inventory form
+router.get("/edit/:inv_id", utilities.handleErrors(invController.editInventoryView));
+
+// ADDED: Route to handle inventory updates
+router.post("/update", 
+  inventoryRules(), // Validation rules
+  checkUpdateData, // FIXED: Now properly imported
+  utilities.handleErrors(invController.updateInventory)
+);
 
 // Show Add Classification Form
 router.get("/add-classification", utilities.handleErrors(invController.showAddClassificationForm));

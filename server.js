@@ -5,6 +5,7 @@
 /* ***********************
  * Require Statements
  *************************/
+const utilities = require("./utilities/")
 const express = require("express")
 const expressLayouts = require("express-ejs-layouts")
 const env = require("dotenv").config()
@@ -17,6 +18,8 @@ const pool = require('./database/')
 const compression = require('compression');
 const errorRoute = require("./routes/errorRoute");
 const flash = require('connect-flash');
+const cookieparser = require("cookie-parser") 
+
 
 /* ***********************
  * Middleware Setup
@@ -34,6 +37,9 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }))
+
+// cookie-parser
+app.use(cookieparser())
 
 
 // Flash messages middleware (AFTER session)
@@ -72,7 +78,7 @@ app.use(static)
 app.get("/", baseController.buildHome)
 
 // Inventory routes
-app.use("/inv", inventoryRoute)
+app.use("/inv", require("./routes/inventoryRoute"))
 
 // Account routes
 app.use("/account", require("./routes/accountRoute"))
@@ -85,10 +91,15 @@ app.use("/error", errorRoute);
  *************************/
 const handleError = require("./middleware/errorHandler");
 
+app.use(utilities.checkJWTToken)
+
 // Catch-all 404
 app.use((req, res) => {
   const nav = ""; /* Optional: replace with await getNav() if needed */
   res.status(404).render("error", {
+
+
+
     title: "404 Not Found",
     nav,
     message: "The page you're looking for does not exist.",
