@@ -5,109 +5,126 @@
 /* ***********************
  * Require Statements
  *************************/
-const utilities = require("./utilities/")
 const express = require("express")
 const expressLayouts = require("express-ejs-layouts")
-const env = require("dotenv").config()
-const app = express()
-const static = require("./routes/static")
-const baseController = require("./controllers/baseController")
-const inventoryRoute = require("./routes/inventoryRoute") 
 const session = require("express-session")
+const flash = require('connect-flash')
+const cookieParser = require("cookie-parser")
+const compression = require('compression')
+const env = require("dotenv").config()
+const utilities = require("./utilities/")
+const baseController = require("./controllers/baseController")
+const static = require("./routes/static")
+const inventoryRoute = require("./routes/inventoryRoute")
+const errorRoute = require("./routes/errorRoute")
 const pool = require('./database/')
-const compression = require('compression');
-const errorRoute = require("./routes/errorRoute");
-const flash = require('connect-flash');
-const cookieparser = require("cookie-parser") 
-
+const handleError = require("./middleware/errorHandler")
+const jwt = require("jsonwebtoken")
+const cookieParser = require("cookie-parser")
+const app = express()
 
 /* ***********************
  * Middleware Setup
+ * IMPORTANT: Order matters!
  *************************/
-// Compression should be early
-app.use(compression());
 
-// Session middleware
+// 1. Compression (first - should compress all responses)
+app.use(compression())
+
+// 2. Static files (before session to avoid unnecessary session creation)
+app.use(express.static('public'))
+
+// 3. Body parsing middleware (needed for form data)
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+// 4. Session middleware (must come before flash and cookie-parser)
 app.use(session({
   store: new (require('connect-pg-simple')(session))({
     createTableIfMissing: true,
     pool,
   }),
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'fallback_secret_change_in_production',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: { 
+    maxAge: 1000 * 60 * 60 * 24, // 24 hours
+    httpOnly: true
+  }
 }))
 
-// cookie-parser
-app.use(cookieparser())
+// 5. Cookie parser (after session)
+app.use(cookieParser())
 
+// 6. Flash middleware (after session)
+app.use(flash())
 
-// Flash messages middleware (AFTER session)
-app.use(flash());
-
-
-// Express messages middleware
-app.use(function(req, res, next){
-  res.locals.messages = req.flash(); // This will give you access to flash messages
-  next();
+// 7. Custom middleware for flash messages and global variables
+app.use((req, res, next) => {
+  // Make flash messages available to all templates
+  res.locals.messages = req.flash()
+  // Make session available to templates
+  res.locals.session = req.session
+  // Make user data available if logged in
+  if (req.cookies.jwt) {
+    try {
+      const decoded = jwt.verify(req.cookies.jwt, process.env.ACCESS_TOKEN_SECRET)
+      res.locals.user = decoded
+    } catch (error) {
+      // Clear invalid token
+      res.clearCookie('jwt')
+    }
+  }
+  next()
 })
-
-// Body parser middleware (important for form data)
-app.use(express.json());
-/* ***************************************************************************************
-**This is the equivalent of body-parser(performs the same function as using the 
-**separate body-parser middleware, which used to be a common practice before Express 4.16.0.)
-* **************************************************************************************** */
-app.use(express.urlencoded({ extended: true })); 
 
 /* ***********************
  * View Engine and Templates
  *************************/
 app.set("view engine", "ejs")
 app.use(expressLayouts)
-app.set("layout", "layouts/layout") /* not at views root */
+app.set("layout", "layouts/layout")
 
 /* ***********************
  * Routes
  *************************/
-// Static routes should come first
-app.use(express.static('public'));
+// Static routes
 app.use(static)
 
 // Index route
 app.get("/", baseController.buildHome)
 
 // Inventory routes
-app.use("/inv", require("./routes/inventoryRoute"))
+app.use("/inv", inventoryRoute)
 
 // Account routes
 app.use("/account", require("./routes/accountRoute"))
 
 // Error routes
-app.use("/error", errorRoute);
+app.use("/error", errorRoute)
+
+/* ***********************
+ * JWT Token Checking Middleware
+ * (After routes that don't need authentication)
+ *************************/
+app.use(utilities.checkJWTToken)
 
 /* ***********************
  * Error Handling Middleware
  *************************/
-const handleError = require("./middleware/errorHandler");
 
-app.use(utilities.checkJWTToken)
-
-// Catch-all 404
-app.use((req, res) => {
-  const nav = ""; /* Optional: replace with await getNav() if needed */
+// Catch-all 404 handler
+app.use(async (req, res) => {
+  const nav = await utilities.getNav()
   res.status(404).render("error", {
-
-
-
     title: "404 Not Found",
     nav,
     message: "The page you're looking for does not exist.",
-  });
-});
+  })
+})
 
 // Global error handler (must be last)
-app.use(handleError);
+app.use(handleError)
 
 /* ***********************
  * Local Server Information
@@ -121,4 +138,5 @@ const host = process.env.HOST || 'localhost'
  *************************/
 app.listen(port, () => {
   console.log(`app listening on ${host}:${port}`)
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`)
 })

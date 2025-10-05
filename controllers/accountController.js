@@ -8,11 +8,22 @@ const { validationResult } = require('express-validator')
 /* ---------- GET: Login View ---------- */
 async function buildLogin(req, res, next) {
     const nav = await utilities.getNav()
+    let successMessage = null
+    if (req.session.loginSuccess) {
+        successMessage = req.session.loginSuccess
+        delete req.session.loginSuccess // Clear it after displaying
+    } else {
+        successMessage = req.flash("success")[0] || null
+    }
+
+    // Get error messages from flash
+    const errorMessage = req.flash("error")[0] || null
     res.render("account/login", {
         title: "Login",
         nav,
-        errors: req.flash(),
-        successMessage: req.flash("Success")
+        errors: errorMessage ? [errorMessage] : [],   // Convert to array for template
+        successMessage: successMessage,
+        account_email: ''
     })
 }
 
@@ -32,11 +43,18 @@ async function buildRegister(req, res, next) {
 /* ---------- GET: Account Management View ---------- */
 async function buildManagement(req, res, next) {
     const nav = await utilities.getNav()
+    let successMessage = null
+    if (req.session.loginSuccess) {
+        successMessage = req.session.loginSuccess
+        delete req.session.loginSuccess // Clear it after displaying
+    } else {
+        successMessage = req.flash("success")[0] || null
+    }
     res.render("inventory/management", {
         title: "Account Management",
         nav,
         errors: null,
-        successMessage: req.flash("success"),
+        successMessage: successMessage,
         message: req.flash("message") || []
     })
 }
@@ -75,13 +93,9 @@ async function registerAccount(req, res, next) {
         )
 
         if (regResult && regResult.rows && regResult.rows.length > 0) {
-            // Show success message on login page
-            return res.render("account/login", {
-                title: "Login",
-                nav,
-                errors: null,
-                successMessage: `Congratulations ${account_firstname}! Your account has been created successfully. Please log in.`
-            })
+            // ✅ CHANGED: Redirect to login with success parameter
+            req.flash("success", `Congratulations ${account_firstname}! Your account has been created successfully. Please log in.`)
+            return res.redirect("/account/login")
         } else {
             const errors = validationResult(req)
             errors.errors.push({ msg: "Sorry, the registration failed." })
@@ -119,25 +133,23 @@ async function accountLogin(req, res) {
   const { account_email, account_password } = req.body
   console.log("=== LOGIN ATTEMPT ===")
   console.log("Email received:", account_email)
-  console.log("Password received:", account_password ? "***" : "undefined")
 
   const accountData = await accountModel.getAccountByEmail(account_email)
   console.log("Account found:", !!accountData)
   
   if (!accountData) {
     console.log("❌ No account found with this email")
-    req.flash("notice", "Please check your credentials and try again.")
+    req.flash("error", "Please check your credentials and try again.")
     return res.status(400).render("account/login", {
       title: "Login",
       nav,
-      errors: null,
+      errors: req.flash(),
       account_email,
+      successMessage: null
     })
   }
   
   try {
-    console.log("Stored hashed password:", accountData.account_password)
-    console.log("Attempting password comparison...")
     
     // Store the result in a variable
     const passwordMatch = await bcrypt.compare(account_password, accountData.account_password)
@@ -164,30 +176,35 @@ async function accountLogin(req, res) {
         res.cookie("jwt", accessToken, { httpOnly: true, secure: true, maxAge: 3600 * 1000 })
       }
       console.log("Cookie set successfully")
+
+      // Add welcome message after login
+      req.session.loginSuccess = `🎉 Welcome back, ${accountData.account_firstname}!`
       
       console.log("Redirecting to /inv/management")
       return res.redirect("/inv/management")
     }
     else {
       console.log("❌ Password incorrect")
-      req.flash("message notice", "Please check your credentials and try again.")
+      req.flash("error", "Please check your credentials and try again.")
       return res.status(400).render("account/login", {
         title: "Login",
         nav,
-        errors: null,
+        errors: req.flash(),
         account_email,
+        successMessage: null
       })
     }
   } catch (error) {
     console.error("🔥 Login error details:", error)
     console.error("Error stack:", error.stack)
     // Don't throw another error, render the login page with error message
-    req.flash("notice", "An error occurred during login. Please try again.")
+    req.flash("error", "An error occurred during login. Please try again.")
     return res.status(500).render("account/login", {
       title: "Login",
       nav,
-      errors: null,
+      errors: req.flash(),
       account_email,
+      successMessage: null
     })
   }
 }

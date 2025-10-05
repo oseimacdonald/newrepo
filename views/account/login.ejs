@@ -1,35 +1,59 @@
-<% if (messages && messages.notice && messages.notice.length) { %>
-  <div class="flash-message">
-    <ul class="notice">
-      <% messages.notice.forEach(function(message) { %>
-        <li><%= message %></li>
-      <% }) %>
-    </ul>
+<main>
+  <div class="container">
+    <!-- Display success messages -->
+    <% if (successMessage) { %>
+      <div class="flash-message success">
+        <%= successMessage %>
+      </div>
+    <% } %>
+
+    <!-- Display error messages from errors array -->
+    <% if (errors && errors.length > 0) { %>
+      <div class="flash-message error">
+        <ul>
+          <% errors.forEach(error => { %>
+            <li><%= error %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+
+    <!-- Keep the existing messages.notice for compatibility -->
+    <% if (messages && messages.notice && messages.notice.length) { %>
+      <div class="flash-message notice">
+        <ul>
+          <% messages.notice.forEach(function(message) { %>
+            <li><%= message %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+
+    <h1><%= title %></h1>
+
+    <form id="loginForm" action="/account/login" method="post" class="auth-form">
+      <label for="account_email">Email</label>
+      <input
+        type="email"
+        id="account_email"
+        name="account_email"
+        value="<%= account_email || '' %>"
+        required
+        autocomplete="email"
+      >
+
+      <label for="account_password">Password</label>
+      <input
+        type="password"
+        id="account_password"
+        name="account_password"
+        required
+        autocomplete="current-password"
+      >
+
+      <button type="submit">Login</button>
+    </form>
+
+    <p>Not registered yet? <a href="/account/register">Create an account</a></p>
   </div>
-<% } %>
-
-<h1><%= title %></h1>
-
-<form id="loginForm" action="/account/login" method="post" class="auth-form">
-  <label for="email">Email</label>
-  <input
-    type="email"
-    id="account_email"
-    name="account_email"
-    required
-    autocomplete="email"
-  >
-
-  <label for="password">Password</label>
-  <input
-    type="password"
-    id="account_password"
-    name="account_password"
-    required
-    autocomplete="current-password"
-  >
-
-  <button type="submit">Login</button>
-</form>
-
-<p>Not registered yet? <a href="/account/register">Create an account</a></p>
+</main>

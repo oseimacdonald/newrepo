@@ -46,11 +46,20 @@ invCont.getVehicleDetail = async function (req, res) {
 invCont.buildManagement = async function (req, res) {
   const nav = await utilities.getNav();
   const classificationSelect = await utilities.buildClassificationList();
+  let successMessage = null;
+  if (req.session && req.session.loginSuccess) {
+    successMessage = req.session.loginSuccess;
+    delete req.session.loginSuccess; // Clear it after displaying
+  } 
+  // Then check for flash success messages
+  else if (req.flash) {
+    successMessage = req.flash('success')[0] || null;
+  }
   res.render("inventory/management", {
     title: "Inventory Management",
     nav,
     classificationSelect,
-    successMessage: null, // Keep it simple for now
+    successMessage: successMessage, // Keep it simple for now
     message: null,        // Keep it simple for now  
     errors: null
   });
