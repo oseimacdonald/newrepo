@@ -1,0 +1,103 @@
+<main>
+  <div class="container">
+    <h1>Account Management</h1>
+
+    <!-- Display flash messages -->
+    <% if (successMessage) { %>
+      <div class="flash-message success">
+        <%= successMessage %>
+      </div>
+    <% } %>
+    
+    <!-- Display errors -->
+    <% if (errors && errors.length > 0) { %>
+      <div class="flash-message error">
+        <ul>
+          <% errors.forEach(error => { %>
+            <li><%= error.msg %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+
+    <!-- Original flash messages -->
+    <% if (message && message.length > 0) { %>
+      <% message.forEach(msg => { %>
+        <div class="flash-message <%= msg.toLowerCase().includes('success') ? 'success' : 'error' %>">
+          <%= msg %>
+        </div>
+      <% }) %>
+    <% } %>
+
+    <div class="management-content">
+      <!-- Welcome message with user's name -->
+      <% if (accountData && accountData.account_firstname) { %>
+        <h2>Welcome <%= accountData.account_firstname %>!</h2>
+      <% } else { %>
+        <h2>Welcome!</h2>
+      <% } %>
+      
+      <!-- Account Information -->
+      <% if (accountData) { %>
+        <div class="account-info" style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+          <h3>Your Account Information</h3>
+          <p><strong>Name:</strong> <%= accountData.account_firstname %> <%= accountData.account_lastname %></p>
+          <p><strong>Email:</strong> <%= accountData.account_email %></p>
+          <p><strong>Account Type:</strong> <%= accountData.account_type %></p>
+        </div>
+      <% } %>
+
+      <h2>Select An Action</h2>
+      
+      <!-- UPDATE ACCOUNT INFORMATION LINK -->
+      <% if (accountData && accountData.account_id) { %>
+        <div class="account-actions" style="margin: 20px 0;">
+          <a href="/account/update/<%= accountData.account_id %>" class="btn" style="display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; margin: 5px;">
+            Update Account Information
+          </a>
+          <a href="/inv" class="btn" style="display: inline-block; padding: 10px 20px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; margin: 5px;">
+            Browse Vehicles
+          </a>
+        </div>
+      <% } %>
+
+      <!-- Inventory Management Section (only for Employee/Admin) -->
+      <% if (accountData && (accountData.account_type === 'Employee' || accountData.account_type === 'Admin')) { %>
+        <div class="inventory-management">
+          <h3>Inventory Management</h3>
+          <p>
+            <a href="/inv/management">Access Inventory Management</a>
+          </p>
+          
+          <h4>Quick Actions</h4>
+          <ul>
+            <li><a href="/inv/add-classification">Add New Classification</a></li>
+            <li><a href="/inv/add-inventory">Add New Inventory</a></li>
+          </ul>
+
+          <!-- Existing Inventory Management Section -->
+          <h4>Manage Existing Inventory</h4>
+          <p>Select a classification from the list to see the items belonging to that class.</p>
+          
+          <% if (classificationSelect) { %>
+            <%- classificationSelect %>
+          <% } %>
+          
+          <table id="inventoryDisplay"></table>
+          <noscript>JavaScript must be enabled to use this page.</noscript>
+        </div>
+      <% } else { %>
+        <!-- Content for Client accounts -->
+        <div class="client-content">
+          <p>You're logged in as a client. You can update your account information using the link above.</p>
+          <p>Browse our vehicle inventory to find your perfect car!</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Only load inventory script for Employee/Admin -->
+  <% if (accountData && (accountData.account_type === 'Employee' || accountData.account_type === 'Admin')) { %>
+    <script src="../../js/inventory.js"></script>
+  <% } %>
+</main>

@@ -4,23 +4,75 @@ const utilities = require("../utilities");
 
 const invCont = {};
 
-// Build inventory by classification
-invCont.buildByClassificationId = async function (req, res) {
+// ========== ADD THIS MISSING FUNCTION ==========
+/* ****************************************
+*  Build browse ALL vehicles view - handles "/inv" route
+* *************************************** */
+invCont.buildByClassification = async function (req, res, next) {
+  try {
+    console.log("🔄 Building ALL vehicles browse page");
+    const nav = await utilities.getNav();
+    
+    // Get all classifications for the navigation
+    const classifications = await invModel.getClassifications();
+    
+    // Get ALL vehicles for browsing
+    const vehicles = await invModel.getAllInventory();
+    
+    console.log("=== ALL VEHICLES DEBUG ===");
+    console.log("Classifications found:", classifications.rows ? classifications.rows.length : 0);
+    console.log("Vehicles found:", vehicles ? vehicles.length : 0);
+    
+    if (vehicles && vehicles.length > 0) {
+      console.log("Sample vehicle:", {
+        id: vehicles[0].inv_id,
+        make: vehicles[0].inv_make,
+        model: vehicles[0].inv_model
+      });
+    }
+    
+    // Build the grid using your existing utility function
+    const grid = await utilities.buildClassificationGrid(vehicles || []);
+    
+    res.render("./inventory/classification", {
+      title: "Browse All Vehicles",
+      nav,
+      grid,
+      classifications: classifications.rows || []
+    });
+  } catch (error) {
+    console.error("❌ Error in buildByClassification:", error);
+    next(error);
+  }
+};
+
+// ========== KEEP ALL YOUR EXISTING FUNCTIONS ==========
+
+/* ****************************************
+*  Build inventory by classification view
+* *************************************** */
+invCont.buildByClassificationId = async function (req, res, next) {
   const classification_id = req.params.classificationId;
   const data = await invModel.getInventoryByClassificationId(classification_id);
   const grid = await utilities.buildClassificationGrid(data);
   const nav = await utilities.getNav();
+
+  //Get all classifications for the navigation
+  const classifications = await invModel.getClassifications();
   const className = data.length > 0 ? data[0].classification_name : "Vehicles";
 
   res.render("./inventory/classification", {
     title: `${className} vehicles`,
     nav,
     grid,
+    classifications: classifications.rows || []
   });
 };
 
-// Get vehicle detail
-invCont.getVehicleDetail = async function (req, res) {
+/* ****************************************
+*  Build vehicle detail view
+* *************************************** */
+invCont.getVehicleDetail = async function (req, res, next) {
   const vehicleId = req.params.vehicleId;
 
   try {
@@ -42,31 +94,35 @@ invCont.getVehicleDetail = async function (req, res) {
   }
 };
 
-// Inventory management view - SIMPLER VERSION
-invCont.buildManagement = async function (req, res) {
+/* ****************************************
+*  Build inventory management view
+* *************************************** */
+invCont.buildManagement = async function (req, res, next) {
   const nav = await utilities.getNav();
   const classificationSelect = await utilities.buildClassificationList();
   let successMessage = null;
+  
   if (req.session && req.session.loginSuccess) {
     successMessage = req.session.loginSuccess;
-    delete req.session.loginSuccess; // Clear it after displaying
-  } 
-  // Then check for flash success messages
-  else if (req.flash) {
+    delete req.session.loginSuccess;
+  } else if (req.flash) {
     successMessage = req.flash('success')[0] || null;
   }
+  
   res.render("inventory/management", {
     title: "Inventory Management",
     nav,
     classificationSelect,
-    successMessage: successMessage, // Keep it simple for now
-    message: null,        // Keep it simple for now  
+    successMessage: successMessage,
+    message: null,
     errors: null
   });
 };
 
-// Show Add Classification form
-invCont.showAddClassificationForm = async function (req, res) {
+/* ****************************************
+*  Show Add Classification form
+* *************************************** */
+invCont.showAddClassificationForm = async function (req, res, next) {
   const nav = await utilities.getNav();
   res.render("inventory/add-classification", {
     title: "Add New Classification",
@@ -76,8 +132,10 @@ invCont.showAddClassificationForm = async function (req, res) {
   });
 };
 
-// Handle POST for Classification
-invCont.addClassification = async function (req, res) {
+/* ****************************************
+*  Add new classification
+* *************************************** */
+invCont.addClassification = async function (req, res, next) {
   const { classification_name } = req.body;
   const nav = await utilities.getNav();
 
@@ -110,8 +168,10 @@ invCont.addClassification = async function (req, res) {
   }
 };
 
-// Show Add Inventory Form (GET)
-invCont.showAddInventoryForm = async function (req, res) {
+/* ****************************************
+*  Show Add Inventory Form
+* *************************************** */
+invCont.showAddInventoryForm = async function (req, res, next) {
   const nav = await utilities.getNav();
   const classificationList = await utilities.buildClassificationList();
 
@@ -125,8 +185,10 @@ invCont.showAddInventoryForm = async function (req, res) {
   });
 };
 
-// Handle POST for adding new vehicle
-invCont.addInventory = async function (req, res) {
+/* ****************************************
+*  Add new inventory item
+* *************************************** */
+invCont.addInventory = async function (req, res, next) {
   const nav = await utilities.getNav();
   const classificationList = await utilities.buildClassificationList();
   const errors = validationResult(req);
@@ -135,7 +197,6 @@ invCont.addInventory = async function (req, res) {
     ...req.body,
   };
 
-  // Check for novalidate attribute from client side
   const isNovalidate = req.body.novalidate === "true";
 
   if (!errors.isEmpty()) {
@@ -163,7 +224,7 @@ invCont.addInventory = async function (req, res) {
       classification_id,
     } = req.body;
 
-    const insertResult = await invModel.addVehicle({
+    const insertResult = await invModel.addInventoryItem({
       inv_make,
       inv_model,
       inv_year,
@@ -204,25 +265,23 @@ invCont.addInventory = async function (req, res) {
   }
 };
 
-/* ***************************
- *  Return Inventory by Classification As JSON
- * ************************** */
+/* ****************************************
+*  Get Inventory by Classification as JSON
+* *************************************** */
 invCont.getInventoryJSON = async (req, res, next) => {
   const classification_id = parseInt(req.params.classification_id)
   const invData = await invModel.getInventoryByClassificationId(classification_id)
   
-  // Safer check for data
   if (invData && invData.length > 0 && invData[0].inv_id) {
     return res.json(invData)
   } else {
-    // Return empty array instead of error for better frontend handling
     return res.json([])
   }
 }
 
-/* ***************************
- *  Build edit inventory view
- * ************************** */
+/* ****************************************
+*  Build edit inventory view
+* *************************************** */
 invCont.editInventoryView = async function (req, res, next) {
   const inv_id = parseInt(req.params.inv_id)
   let nav = await utilities.getNav()
@@ -249,9 +308,9 @@ invCont.editInventoryView = async function (req, res, next) {
   })
 }
 
-/* ***************************
- *  Update Inventory Data
- * ************************** */
+/* ****************************************
+*  Update Inventory Data
+* *************************************** */
 invCont.updateInventory = async function (req, res, next) {
   let nav = await utilities.getNav()
   const {

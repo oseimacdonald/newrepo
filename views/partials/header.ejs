@@ -3,9 +3,9 @@
         <a href="/" title="Return to home page">Mac Motors</a>
     </span>
     <div id="tools">
-        <% if (locals.user) { %>
+        <% if (locals.accountData) { %>
             <!-- Display when user is logged in -->
-            <a title="Welcome message" href="/account/manage">Welcome <%= locals.user.name || 'User' %></a>
+            <a title="Welcome message" href="/account">Welcome <%= locals.accountData.account_firstname || 'User' %></a>
             <a title="Click to log out" href="/account/logout">Logout</a>
         <% } else { %>
             <!-- Display when user is not logged in -->

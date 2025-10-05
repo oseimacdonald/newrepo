@@ -1,0 +1,174 @@
+<main>
+  <div class="container">
+    <h1>Update Account Information</h1>
+
+    <!-- Display flash messages -->
+    <% if (message && message.length > 0) { %>
+      <div class="flash-message <%= message[0].toLowerCase().includes('success') ? 'success' : 'info' %>">
+        <%= message[0] %>
+      </div>
+    <% } %>
+
+    <!-- Display errors -->
+    <% if (errors && errors.length > 0) { %>
+      <div class="flash-message error">
+        <ul>
+          <% errors.forEach(error => { %>
+            <li><%= error.msg %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+
+    <!-- Account Update Form -->
+    <section class="form-section">
+      <h2>Account Update</h2>
+      <form action="/account/update" method="post" class="account-form" novalidate>
+        <input type="hidden" name="account_id" value="<%= account_id %>">
+        
+        <div class="form-group">
+          <label for="account_firstname">First Name: *</label>
+          <input 
+            type="text" 
+            id="account_firstname" 
+            name="account_firstname" 
+            value="<%= account_firstname || '' %>" 
+            required
+            minlength="1"
+            maxlength="50"
+            pattern="[A-Za-z\s\-']+"
+            title="First name should contain only letters, spaces, hyphens, or apostrophes"
+          >
+          <small class="form-text">Required field</small>
+        </div>
+
+        <div class="form-group">
+          <label for="account_lastname">Last Name: *</label>
+          <input 
+            type="text" 
+            id="account_lastname" 
+            name="account_lastname" 
+            value="<%= account_lastname || '' %>" 
+            required
+            minlength="1"
+            maxlength="50"
+            pattern="[A-Za-z\s\-']+"
+            title="Last name should contain only letters, spaces, hyphens, or apostrophes"
+          >
+          <small class="form-text">Required field</small>
+        </div>
+
+        <div class="form-group">
+          <label for="account_email">Email Address: *</label>
+          <input 
+            type="email" 
+            id="account_email" 
+            name="account_email" 
+            value="<%= account_email || '' %>" 
+            required
+            maxlength="100"
+            pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+            title="Please enter a valid email address"
+          >
+          <small class="form-text">Required field</small>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Update Account Information</button>
+          <a href="/account" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </section>
+
+    <!-- Change Password Form -->
+    <section class="form-section">
+      <h2>Change Password</h2>
+      <form action="/account/change-password" method="post" class="password-form" novalidate>
+        <input type="hidden" name="account_id" value="<%= account_id %>">
+        
+        <div class="password-info">
+          <p><strong>Note:</strong> Entering a new password will immediately change your current password.</p>
+          <div class="password-requirements">
+            <strong>Password Requirements:</strong>
+            <ul>
+              <li>Minimum 12 characters</li>
+              <li>At least 1 uppercase letter (A-Z)</li>
+              <li>At least 1 lowercase letter (a-z)</li>
+              <li>At least 1 number (0-9)</li>
+              <li>At least 1 special character (!@#$%^&*)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="account_password">New Password: *</label>
+          <input 
+            type="password" 
+            id="account_password" 
+            name="account_password" 
+            required
+            minlength="12"
+            pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+            title="Password must be at least 12 characters long and include uppercase, lowercase, number, and special character"
+            autocomplete="new-password"
+          >
+          <small class="form-text">Must meet all requirements listed above</small>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Change Password</button>
+          <a href="/account" class="btn btn-secondary">Back to Account</a>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- Client-side form validation -->
+  <script>
+    // Add real-time validation feedback
+    document.addEventListener('DOMContentLoaded', function() {
+      const forms = document.querySelectorAll('form');
+      
+      forms.forEach(form => {
+        const inputs = form.querySelectorAll('input[required]');
+        
+        inputs.forEach(input => {
+          // Add validation styling on blur
+          input.addEventListener('blur', function() {
+            if (this.value.trim() === '') {
+              this.classList.add('invalid');
+              this.classList.remove('valid');
+            } else if (this.checkValidity()) {
+              this.classList.add('valid');
+              this.classList.remove('invalid');
+            } else {
+              this.classList.add('invalid');
+              this.classList.remove('valid');
+            }
+          });
+          
+          // Clear validation styling on focus
+          input.addEventListener('focus', function() {
+            this.classList.remove('invalid', 'valid');
+          });
+        });
+        
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+          let isValid = true;
+          inputs.forEach(input => {
+            if (!input.checkValidity()) {
+              isValid = false;
+              input.classList.add('invalid');
+            }
+          });
+          
+          if (!isValid) {
+            e.preventDefault();
+            alert('Please fix the errors in the form before submitting.');
+          }
+        });
+      });
+    });
+  </script>
+</main>

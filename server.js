@@ -20,25 +20,23 @@ const errorRoute = require("./routes/errorRoute")
 const pool = require('./database/')
 const handleError = require("./middleware/errorHandler")
 const jwt = require("jsonwebtoken")
-const cookieParser = require("cookie-parser")
 const app = express()
 
 /* ***********************
  * Middleware Setup
- * IMPORTANT: Order matters!
  *************************/
 
-// 1. Compression (first - should compress all responses)
+// 1. Compression
 app.use(compression())
 
-// 2. Static files (before session to avoid unnecessary session creation)
+// 2. Static files
 app.use(express.static('public'))
 
-// 3. Body parsing middleware (needed for form data)
+// 3. Body parsing middleware
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-// 4. Session middleware (must come before flash and cookie-parser)
+// 4. Session middleware
 app.use(session({
   store: new (require('connect-pg-simple')(session))({
     createTableIfMissing: true,
@@ -53,30 +51,38 @@ app.use(session({
   }
 }))
 
-// 5. Cookie parser (after session)
+// 5. Cookie parser
 app.use(cookieParser())
 
-// 6. Flash middleware (after session)
+// 6. Flash middleware
 app.use(flash())
 
-// 7. Custom middleware for flash messages and global variables
-app.use((req, res, next) => {
+// 7. Global User Middleware - This handles JWT tokens for ALL routes
+app.use(async (req, res, next) => {
   // Make flash messages available to all templates
   res.locals.messages = req.flash()
-  // Make session available to templates
   res.locals.session = req.session
-  // Make user data available if logged in
-  if (req.cookies.jwt) {
+  
+  // JWT Token Verification for template variables
+  const token = req.cookies.jwt;
+  if (token) {
     try {
-      const decoded = jwt.verify(req.cookies.jwt, process.env.ACCESS_TOKEN_SECRET)
-      res.locals.user = decoded
+      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      res.locals.accountData = decoded; // Use accountData for consistency
+      res.locals.loggedin = 1;
+      req.accountData = decoded;
     } catch (error) {
-      // Clear invalid token
-      res.clearCookie('jwt')
+      console.error("JWT verification error:", error.message);
+      res.locals.accountData = null;
+      res.locals.loggedin = 0;
+      res.clearCookie('jwt');
     }
+  } else {
+    res.locals.accountData = null;
+    res.locals.loggedin = 0;
   }
-  next()
-})
+  next();
+});
 
 /* ***********************
  * View Engine and Templates
@@ -104,16 +110,10 @@ app.use("/account", require("./routes/accountRoute"))
 app.use("/error", errorRoute)
 
 /* ***********************
- * JWT Token Checking Middleware
- * (After routes that don't need authentication)
- *************************/
-app.use(utilities.checkJWTToken)
-
-/* ***********************
  * Error Handling Middleware
  *************************/
 
-// Catch-all 404 handler
+// 404 handler
 app.use(async (req, res) => {
   const nav = await utilities.getNav()
   res.status(404).render("error", {
@@ -123,19 +123,15 @@ app.use(async (req, res) => {
   })
 })
 
-// Global error handler (must be last)
+// Global error handler
 app.use(handleError)
 
 /* ***********************
- * Local Server Information
- * Values from .env (environment) file
+ * Server Configuration
  *************************/
 const port = process.env.PORT || 5500
 const host = process.env.HOST || 'localhost'
 
-/* ***********************
- * Log statement to confirm server operation
- *************************/
 app.listen(port, () => {
   console.log(`app listening on ${host}:${port}`)
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`)

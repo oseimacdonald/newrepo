@@ -128,11 +128,30 @@ async function updateInventory(
   }
 }
 
+// Add this to your inventory-model.js
+
+/* ***************************
+ *  Get ALL inventory items (not filtered by classification)
+ * ************************** */
+async function getAllInventory() {
+  try {
+    const data = await pool.query(
+      `SELECT * FROM public.inventory 
+       ORDER BY inv_make, inv_model`
+    );
+    return data.rows;
+  } catch (error) {
+    console.error("getAllInventory error: " + error);
+    return [];
+  }
+}
+
 module.exports = {
   getClassifications, 
   getInventoryByClassificationId, 
   getVehicleById, 
   addClassification,
   addInventoryItem,
-  updateInventory 
+  updateInventory,
+  getAllInventory 
 };

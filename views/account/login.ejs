@@ -1,7 +1,7 @@
 <main>
   <div class="container">
-    <!-- Display success messages -->
-    <% if (successMessage) { %>
+    <!-- Display success messages - SAFER VERSION -->
+    <% if (typeof successMessage !== 'undefined' && successMessage) { %>
       <div class="flash-message success">
         <%= successMessage %>
       </div>
@@ -12,7 +12,7 @@
       <div class="flash-message error">
         <ul>
           <% errors.forEach(error => { %>
-            <li><%= error %></li>
+            <li><%= error.msg %></li>
           <% }) %>
         </ul>
       </div>
@@ -32,28 +32,34 @@
     <h1><%= title %></h1>
 
     <form id="loginForm" action="/account/login" method="post" class="auth-form">
-      <label for="account_email">Email</label>
-      <input
-        type="email"
-        id="account_email"
-        name="account_email"
-        value="<%= account_email || '' %>"
-        required
-        autocomplete="email"
-      >
+      <div class="form-group">
+        <label for="account_email">Email</label>
+        <input
+          type="email"
+          id="account_email"
+          name="account_email"
+          value="<%= account_email || '' %>"
+          required
+          autocomplete="email"
+        >
+      </div>
 
-      <label for="account_password">Password</label>
-      <input
-        type="password"
-        id="account_password"
-        name="account_password"
-        required
-        autocomplete="current-password"
-      >
+      <div class="form-group">
+        <label for="account_password">Password</label>
+        <input
+          type="password"
+          id="account_password"
+          name="account_password"
+          required
+          autocomplete="current-password"
+        >
+      </div>
 
-      <button type="submit">Login</button>
+      <button type="submit" class="submit-btn">Login</button>
     </form>
 
-    <p>Not registered yet? <a href="/account/register">Create an account</a></p>
+    <div class="login-link">
+      <p>Not registered yet? <a href="/account/register">Create an account</a></p>
+    </div>
   </div>
 </main>

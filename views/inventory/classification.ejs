@@ -1,12 +1,32 @@
-<!--Content heading -->
+<!-- Content heading -->
 <% if (title) { %>
 <h1><%= title %></h1>
 <% } else {
   res.redirect('/')
 } %>
 
-<!--Content message-->
-<%# messages() %>
+<!-- Debug Info - SAFER VERSION -->
+<div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px;">
+    <strong>Page Info:</strong><br>
+    Title: <%= title %><br>
+    Classifications Available: <%= typeof classifications !== 'undefined' ? classifications.length : 0 %>
+</div>
 
-<!--Content Inventory items display-->
-<%- grid %>
+<!-- Browse by Classification - SAFER VERSION -->
+<% if (typeof classifications !== 'undefined' && classifications && classifications.length > 0) { %>
+<div class="classification-browse">
+    <h2>Browse by Category</h2>
+    <div class="classification-links" style="display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap;">
+        <% classifications.forEach(classification => { %>
+            <a href="/inv/type/<%= classification.classification_id %>" 
+               class="classification-link" 
+               style="padding: 8px 15px; background: #f0f0f0; border-radius: 4px; text-decoration: none; color: #333;">
+                <%= classification.classification_name %>
+            </a>
+        <% }) %>
+    </div>
+</div>
+<% } %>
+
+<!-- Content Inventory items display -->
+<%- typeof grid !== 'undefined' ? grid : '<p>No vehicles to display</p>' %>
