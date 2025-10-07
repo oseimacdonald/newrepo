@@ -96,7 +96,7 @@
     </div>
   </div>
 
-  <!-- Only load inventory script for Employee/Admin -->
+  
   <% if (accountData && (accountData.account_type === 'Employee' || accountData.account_type === 'Admin')) { %>
     <script src="../../js/inventory.js"></script>
   <% } %>

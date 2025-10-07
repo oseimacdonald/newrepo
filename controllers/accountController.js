@@ -55,7 +55,7 @@ async function buildManagement(req, res, next) {
     const account_id = res.locals.accountData.account_id;
     const accountData = await accountModel.getAccountById(account_id);
 
-    // FIXED: Changed from "inventory/management" to "account/management"
+    //"account/management"
     res.render("account/management", {
         title: "Account Management",
         nav,
@@ -129,7 +129,7 @@ async function updateAccount(req, res, next) {
         )
 
         if (updateResult) {
-            // Update JWT token with new information
+            // Update JWT token
             const accountData = await accountModel.getAccountById(account_id)
             delete accountData.account_password
             
@@ -329,7 +329,7 @@ async function accountLogin(req, res) {
         account_firstname: accountData.account_firstname,
         account_lastname: accountData.account_lastname,
         account_email: accountData.account_email,
-        account_type: accountData.account_type  // Make sure this exists!
+        account_type: accountData.account_type  
       });
       
       // Check if ACCESS_TOKEN_SECRET is set
@@ -350,7 +350,7 @@ async function accountLogin(req, res) {
       }
       console.log("Cookie set successfully")
 
-      // Add welcome message after login
+      // welcome message after login
       req.session.loginSuccess = `🎉 Welcome back, ${accountData.account_firstname}!`
       
       // PROPER ROLE-BASED REDIRECT:
