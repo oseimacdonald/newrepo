@@ -133,7 +133,7 @@ Util.checkLogin = (req, res, next) => {
       process.env.ACCESS_TOKEN_SECRET,
       function (err, accountData) {
         if (err) {
-          req.flash("notice", "Please log in")
+          req.flash("Please log in")
           res.clearCookie("jwt")
           return res.redirect("/account/login")
         }
@@ -142,7 +142,7 @@ Util.checkLogin = (req, res, next) => {
         next()
       })
   } else {
-    req.flash("notice", "Please log in")
+    req.flash("Please log in")
     return res.redirect("/account/login")
   }
 }
