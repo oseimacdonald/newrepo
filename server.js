@@ -26,6 +26,9 @@ const app = express()
  * Middleware Setup
  *************************/
 
+console.log("ACCESS_TOKEN_SECRET loaded:", process.env.ACCESS_TOKEN_SECRET ? 'Yes' : 'No')
+
+
 // Trust proxy for Render.com
 app.set('trust proxy', 1);
 
