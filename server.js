@@ -17,7 +17,7 @@ const baseController = require("./controllers/baseController")
 const static = require("./routes/static")
 const inventoryRoute = require("./routes/inventoryRoute")
 const errorRoute = require("./routes/errorRoute")
-const pool = require('./database/')
+const db = require('./database/')
 const handleError = require("./middleware/errorHandler")
 const jwt = require("jsonwebtoken")
 const app = express()
@@ -25,6 +25,9 @@ const app = express()
 /* ***********************
  * Middleware Setup
  *************************/
+
+// Trust proxy for Render.com
+app.set('trust proxy', 1);
 
 // 1. Compression
 app.use(compression())
@@ -36,18 +39,23 @@ app.use(express.static('public'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-// 4. Session middleware
+// 4. Session middleware - Fixed for production
+const PGStore = require('connect-pg-simple')(session)
+
 app.use(session({
-  store: new (require('connect-pg-simple')(session))({
+  store: new PGStore({
+    pool: db.pool,
     createTableIfMissing: true,
-    pool,
+    pruneSessionInterval: false,
   }),
   secret: process.env.SESSION_SECRET || 'fallback_secret_change_in_production',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: { 
     maxAge: 1000 * 60 * 60 * 24, // 24 hours
-    httpOnly: true
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   }
 }))
 
@@ -68,7 +76,7 @@ app.use(async (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-      res.locals.accountData = decoded; // Use accountData for consistency
+      res.locals.accountData = decoded;
       res.locals.loggedin = 1;
       req.accountData = decoded;
     } catch (error) {
@@ -90,6 +98,38 @@ app.use(async (req, res, next) => {
 app.set("view engine", "ejs")
 app.use(expressLayouts)
 app.set("layout", "layouts/layout")
+
+/* ***********************
+ * Debug Routes (Add before main routes)
+ *************************/
+app.get('/api/debug', (req, res) => {
+  res.json({
+    status: 'Server is running',
+    environment: process.env.NODE_ENV,
+    database: process.env.DATABASE_URL ? 'Set' : 'Missing',
+    sessionSecret: process.env.SESSION_SECRET ? 'Set' : 'Missing',
+    jwtSecret: process.env.ACCESS_TOKEN_SECRET ? 'Set' : 'Missing',
+    host: req.get('host'),
+    secure: req.secure
+  })
+})
+
+app.get('/api/debug-db', async (req, res) => {
+  try {
+    const result = await db.query('SELECT version(), current_database() as db_name')
+    res.json({
+      status: 'SUCCESS',
+      database: result.rows[0],
+      environment: process.env.NODE_ENV
+    })
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      error: error.message,
+      environment: process.env.NODE_ENV
+    })
+  }
+})
 
 /* ***********************
  * Routes
