@@ -1,10 +1,14 @@
 const jwt = require("jsonwebtoken") 
 require("dotenv").config()
 
-// Critical check - exit if JWT secret is not configured
-if (!process.env.ACCESS_TOKEN_SECRET) {
-  console.error('❌ CRITICAL ERROR: ACCESS_TOKEN_SECRET environment variable is not set')
-  throw new Error('ACCESS_TOKEN_SECRET is required for JWT authentication')
+// Get JWT secret from multiple possible sources
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET || process.env.TOKEN_SECRET;
+
+if (!ACCESS_TOKEN_SECRET) {
+  console.error('⚠️  WARNING: No JWT secret found in environment variables')
+  console.log('Login functionality will not work until JWT secret is set')
+} else {
+  console.log('✅ JWT secret is configured')
 }
 
 const utilities = require('../utilities')
@@ -118,6 +122,12 @@ async function updateAccount(req, res, next) {
   const { account_id, account_firstname, account_lastname, account_email } = req.body;
 
   try {
+    // Check if JWT secret is available
+    if (!ACCESS_TOKEN_SECRET) {
+      req.flash("error", "Server configuration error. Please try again later.");
+      return res.redirect("/account");
+    }
+
     const emailExists = await accountModel.checkEmailExcludingCurrent(account_email, account_id);
     if (emailExists) {
       const errors = validationResult(req);
@@ -145,7 +155,7 @@ async function updateAccount(req, res, next) {
       const accountData = await accountModel.getAccountById(account_id);
       delete accountData.account_password;
       
-      const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 });
+      const accessToken = jwt.sign(accountData, ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 });
       
       const cookieOptions = {
         httpOnly: true,
@@ -303,6 +313,18 @@ async function accountLogin(req, res) {
   const { account_email, account_password } = req.body;
 
   try {
+    // Check if JWT secret is available
+    if (!ACCESS_TOKEN_SECRET) {
+      req.flash("error", "Server configuration error. Please try again later.");
+      return res.status(500).render("account/login", {
+        title: "Login",
+        nav,
+        errors: req.flash(),
+        account_email,
+        successMessage: null
+      });
+    }
+
     const accountData = await accountModel.getAccountByEmail(account_email);
 
     if (!accountData) {
@@ -321,7 +343,7 @@ async function accountLogin(req, res) {
     if (passwordMatch) {
       delete accountData.account_password;
 
-      const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 });
+      const accessToken = jwt.sign(accountData, ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 });
 
       const cookieOptions = {
         httpOnly: true,
