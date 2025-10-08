@@ -42,6 +42,7 @@ console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? 'Set' : 'Missing')
 console.log('ACCESS_TOKEN_SECRET:', process.env.ACCESS_TOKEN_SECRET ? `Set (length: ${process.env.ACCESS_TOKEN_SECRET.length})` : 'MISSING')
 console.log('================================')
 
+
 /* ***********************
  * Middleware Setup
  *************************/
