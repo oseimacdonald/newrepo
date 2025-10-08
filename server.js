@@ -36,20 +36,67 @@ app.use(express.static('public'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-// 4. Session middleware
+// 4. Session middleware with better configuration
 app.use(session({
   store: new (require('connect-pg-simple')(session))({
     createTableIfMissing: true,
-    pool,
+    pool: require('./database/').pool,
+    // Add these settings for connect-pg-simple
+    pruneSessionInterval: process.env.NODE_ENV === 'production' ? 60 : false, // 60 seconds or disable in dev
+    ttl: 24 * 60 * 60, // 24 hours in seconds
+    errorLog: (message) => console.log('Session store:', message)
   }),
   secret: process.env.SESSION_SECRET || 'fallback_secret_change_in_production',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false, // Changed to false for security
+  rolling: true, // Reset maxAge on every request
   cookie: { 
     maxAge: 1000 * 60 * 60 * 24, // 24 hours
-    httpOnly: true
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    sameSite: 'lax'
   }
 }))
+
+// Database connection health check middleware
+app.use(async (req, res, next) => {
+  // Skip health check for static assets and health endpoint
+  if (req.path.includes('.') || req.path === '/health') {
+    return next()
+  }
+  
+  try {
+    // Simple query to check database connection
+    await pool.query('SELECT 1 as connection_test')
+    res.locals.dbHealthy = true
+    next()
+  } catch (error) {
+    console.error('❌ Database connection health check failed:', error.message)
+    
+    // Don't block the request, but log the issue
+    res.locals.dbHealthy = false
+    next()
+  }
+})
+
+// Add a health check endpoint
+app.get('/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1 as health_check')
+    res.status(200).json({ 
+      status: 'OK', 
+      database: 'connected',
+      timestamp: new Date().toISOString()
+    })
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'ERROR', 
+      database: 'disconnected',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    })
+  }
+})
 
 // 5. Cookie parser
 app.use(cookieParser())
