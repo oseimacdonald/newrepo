@@ -11,7 +11,17 @@ const session = require("express-session")
 const flash = require('connect-flash')
 const cookieParser = require("cookie-parser")
 const compression = require('compression')
+
+// Load environment variables FIRST
 const env = require("dotenv").config()
+
+// Critical environment variable check
+if (!process.env.ACCESS_TOKEN_SECRET) {
+  console.error('❌ CRITICAL ERROR: ACCESS_TOKEN_SECRET environment variable is not set')
+  console.error('Please set ACCESS_TOKEN_SECRET in your Render.com environment variables')
+  process.exit(1) // Stop the application if JWT secret is missing
+}
+
 const utilities = require("./utilities/")
 const baseController = require("./controllers/baseController")
 const static = require("./routes/static")
@@ -23,14 +33,21 @@ const jwt = require("jsonwebtoken")
 const app = express()
 
 /* ***********************
+ * Environment Verification
+ *************************/
+console.log('=== ENVIRONMENT VERIFICATION ===')
+console.log('NODE_ENV:', process.env.NODE_ENV)
+console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Missing')
+console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? 'Set' : 'Missing')
+console.log('ACCESS_TOKEN_SECRET:', process.env.ACCESS_TOKEN_SECRET ? `Set (length: ${process.env.ACCESS_TOKEN_SECRET.length})` : 'MISSING')
+console.log('================================')
+
+/* ***********************
  * Middleware Setup
  *************************/
 
-console.log("ACCESS_TOKEN_SECRET loaded:", process.env.ACCESS_TOKEN_SECRET ? 'Yes' : 'No')
-
-
 // Trust proxy for Render.com
-app.set('trust proxy', 1);
+app.set('trust proxy', 1)
 
 // 1. Compression
 app.use(compression())
@@ -51,7 +68,7 @@ app.use(session({
     createTableIfMissing: true,
     pruneSessionInterval: false,
   }),
-  secret: process.env.SESSION_SECRET || 'fallback_secret_change_in_production',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: { 
@@ -112,6 +129,7 @@ app.get('/api/debug', (req, res) => {
     database: process.env.DATABASE_URL ? 'Set' : 'Missing',
     sessionSecret: process.env.SESSION_SECRET ? 'Set' : 'Missing',
     jwtSecret: process.env.ACCESS_TOKEN_SECRET ? 'Set' : 'Missing',
+    jwtSecretLength: process.env.ACCESS_TOKEN_SECRET ? process.env.ACCESS_TOKEN_SECRET.length : 0,
     host: req.get('host'),
     secure: req.secure
   })
@@ -132,6 +150,22 @@ app.get('/api/debug-db', async (req, res) => {
       environment: process.env.NODE_ENV
     })
   }
+})
+
+app.get('/api/check-jwt', (req, res) => {
+  if (!process.env.ACCESS_TOKEN_SECRET) {
+    return res.status(500).json({
+      status: 'ERROR',
+      message: 'ACCESS_TOKEN_SECRET is not configured',
+      help: 'Set ACCESS_TOKEN_SECRET in Render.com environment variables'
+    })
+  }
+  
+  res.json({
+    status: 'SUCCESS',
+    message: 'JWT is properly configured',
+    environment: process.env.NODE_ENV
+  })
 })
 
 /* ***********************
@@ -178,4 +212,10 @@ const host = process.env.HOST || 'localhost'
 app.listen(port, () => {
   console.log(`app listening on ${host}:${port}`)
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`)
+  console.log(`JWT Secret Status: ${process.env.ACCESS_TOKEN_SECRET ? '✅ Configured' : '❌ Missing'}`)
+  
+  if (!process.env.ACCESS_TOKEN_SECRET) {
+    console.log('❌ APPLICATION WILL NOT START: ACCESS_TOKEN_SECRET is required')
+    process.exit(1)
+  }
 })
