@@ -368,4 +368,214 @@ invCont.updateInventory = async function (req, res, next) {
   }
 }
 
+/* ****************************************
+*  Build upgrades selection view
+* *************************************** */
+invCont.buildUpgradesView = async function (req, res, next) {
+  const vehicleId = req.params.vehicleId;
+  try {
+    const nav = await utilities.getNav();
+    const vehicleData = await invModel.getVehicleById(vehicleId);
+    const availableUpgrades = await invModel.getUpgradesByVehicleId(vehicleId);
+    
+    res.render("./upgrades/upgrades", {
+      title: `Customize ${vehicleData.inv_make} ${vehicleData.inv_model}`,
+      nav,
+      vehicleData,
+      availableUpgrades,
+      errors: null
+    });
+  } catch (error) {
+    console.error("Error building upgrades view:", error);
+    next(error);
+  }
+};
+
+/* ****************************************
+*  Add upgrade to cart
+* *************************************** */
+invCont.addUpgradeToCart = async function (req, res, next) {
+  try {
+    const { upgrade_id, vehicle_id, quantity } = req.body;
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        success: false, 
+        errors: errors.array() 
+      });
+    }
+    
+    const result = await invModel.addUpgradeToCart(
+      upgrade_id, 
+      vehicle_id, 
+      quantity, 
+      req.account?.account_id
+    );
+    
+    if (result) {
+      res.json({ 
+        success: true, 
+        message: "Upgrade added to cart successfully",
+        cartCount: await invModel.getCartCount(req.account?.account_id)
+      });
+    } else {
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to add upgrade to cart" 
+      });
+    }
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    next(error);
+  }
+};
+
+/* ****************************************
+*  Add item to cart (for regular inventory items)
+* *************************************** */
+invCont.addToCart = async function (req, res, next) {
+  try {
+    const { inv_id, quantity = 1 } = req.body;
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        success: false, 
+        errors: errors.array() 
+      });
+    }
+    
+    // Use account_id from authentication middleware
+    const account_id = req.account?.account_id;
+    
+    if (!account_id) {
+      return res.status(401).json({ 
+        success: false, 
+        message: "Please log in to add items to cart" 
+      });
+    }
+    
+    const result = await invModel.addToCart(account_id, inv_id, quantity);
+    
+    if (result) {
+      res.json({ 
+        success: true, 
+        message: "Item added to cart successfully",
+        cartCount: await invModel.getCartCount(account_id)
+      });
+    } else {
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to add item to cart" 
+      });
+    }
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    next(error);
+  }
+};
+
+/* ****************************************
+*  Build shopping cart view
+* *************************************** */
+invCont.buildCartView = async function (req, res, next) {
+  try {
+    const nav = await utilities.getNav();
+    // Use whatever account ID your auth middleware provides
+    const account_id = req.account?.account_id || req.user?.account_id;
+    
+    const cartItems = await invModel.getCartItems(account_id);
+    const totalPrice = await invModel.calculateCartTotal(account_id);
+    
+    res.render("./cart/cart", {
+      title: "Shopping Cart",
+      nav,
+      cartItems,
+      totalPrice,
+      errors: null
+    });
+  } catch (error) {
+    console.error("Error building cart view:", error);
+    next(error);
+  }
+};
+
+/* ****************************************
+*  Remove item from cart
+* *************************************** */
+invCont.buildCheckoutView = async function (req, res, next) {
+  try {
+    const nav = await utilities.getNav()
+    res.render("cart/checkout", {
+      title: "Checkout",
+      nav,
+      message: null,
+      errors: null
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+/* ****************************************
+*  Update cart item quantity
+* *************************************** */
+invCont.buildCheckoutView = async function (req, res, next) {
+  try {
+    const nav = await utilities.getNav();
+    const account_id = req.account?.account_id || req.user?.account_id;
+
+    const cartItems = await invModel.getCartItems(account_id);
+    const totalPrice = await invModel.calculateCartTotal(account_id);
+
+    if (!cartItems || cartItems.length === 0) {
+      req.flash("notice", "Your cart is empty");
+      return res.redirect("/cart");
+    }
+
+    res.render("./cart/checkout", {
+      title: "Checkout",
+      nav,
+      cartItems,
+      totalPrice,
+      errors: null,
+    });
+  } catch (error) {
+    console.error("Error building checkout view:", error);
+    next(error);
+  }
+};
+
+
+/* ****************************************
+*  Build checkout view
+* *************************************** */
+async function updateCartQuantity (req, res, next) {
+  try {
+    const nav = await utilities.getNav();
+    const account_id = req.account?.account_id || req.user?.account_id;
+    
+    const cartItems = await invModel.getCartItems(account_id);
+    const totalPrice = await invModel.calculateCartTotal(account_id);
+    
+    if (!cartItems || cartItems.length === 0) {
+      req.flash("notice", "Your cart is empty");
+      return res.redirect("/cart");
+    }
+    
+    res.render("./cart/checkout", {
+      title: "Checkout",
+      nav,
+      cartItems,
+      totalPrice,
+      errors: null
+    });
+  } catch (error) {
+    console.error("Error building checkout view:", error);
+    next(error);
+  }
+};
+
 module.exports = invCont;

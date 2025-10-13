@@ -1,0 +1,59 @@
+<div class="upgrades-container">
+    <h1>Customize Your <%= vehicleData.inv_year %> <%= vehicleData.inv_make %> <%= vehicleData.inv_model %></h1>
+    
+    <div class="upgrades-content">
+        <div class="vehicle-preview">
+            <img src="<%= vehicleData.inv_image %>" 
+                 alt="<%= vehicleData.inv_year %> <%= vehicleData.inv_make %> <%= vehicleData.inv_model %>">
+            <div class="vehicle-base-price">
+                Base Price: <%= new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(vehicleData.inv_price) %>
+            </div>
+        </div>
+        
+        <div class="available-upgrades">
+            <h2>Available Upgrades</h2>
+            
+            <% if (availableUpgrades && availableUpgrades.length > 0) { %>
+                <div class="upgrades-list">
+                    <% availableUpgrades.forEach(function(upgrade) { %>
+                        <div class="upgrade-option" data-upgrade-id="<%= upgrade.upgrade_id %>">
+                            <div class="upgrade-image">
+                                <img src="<%= upgrade.upgrade_image || '/images/upgrades/default-upgrade.jpg' %>" 
+                                     alt="<%= upgrade.upgrade_name %>">
+                            </div>
+                            <div class="upgrade-details">
+                                <h3><%= upgrade.upgrade_name %></h3>
+                                <p><%= upgrade.upgrade_description %></p>
+                                <div class="upgrade-price">
+                                    <%= new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(upgrade.upgrade_price) %>
+                                </div>
+                            </div>
+                            <div class="upgrade-actions">
+                                <div class="quantity-selector">
+                                    <label>Qty:</label>
+                                    <select class="upgrade-quantity" data-upgrade-id="<%= upgrade.upgrade_id %>">
+                                        <% for(let i = 1; i <= 10; i++) { %>
+                                            <option value="<%= i %>"><%= i %></option>
+                                        <% } %>
+                                    </select>
+                                </div>
+                                <button class="add-upgrade-btn" 
+                                        data-upgrade-id="<%= upgrade.upgrade_id %>"
+                                        data-vehicle-id="<%= vehicleData.inv_id %>">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <p>No upgrades currently available for this vehicle.</p>
+            <% } %>
+            
+            <div class="upgrades-navigation">
+                <a href="/inv/detail/<%= vehicleData.inv_id %>" class="back-to-vehicle-btn">Back to Vehicle Details</a>
+                <a href="/cart" class="view-cart-btn">View Cart (<span id="upgrades-cart-count">0</span>)</a>
+            </div>
+        </div>
+    </div>
+</div>

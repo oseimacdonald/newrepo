@@ -16,7 +16,9 @@ const utilities = require("./utilities/")
 const baseController = require("./controllers/baseController")
 const static = require("./routes/static")
 const inventoryRoute = require("./routes/inventoryRoute")
+const accountRoute = require("./routes/accountRoute")
 const errorRoute = require("./routes/errorRoute")
+const cartRoute = require("./routes/cartRoute") 
 const pool = require('./database/')
 const handleError = require("./middleware/errorHandler")
 const jwt = require("jsonwebtoken")
@@ -87,7 +89,10 @@ app.get("/", baseController.buildHome)
 app.use("/inv", inventoryRoute)
 
 // Account routes
-app.use("/account", require("./routes/accountRoute"))
+app.use("/account", accountRoute)
+
+// Cart routes - ADD THIS SECTION
+app.use("/cart", cartRoute)
 
 // Error routes
 app.use("/error", errorRoute)

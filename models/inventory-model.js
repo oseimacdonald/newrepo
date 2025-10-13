@@ -146,6 +146,174 @@ async function getAllInventory() {
   }
 }
 
+/* ****************************************
+*  Get upgrades available for a specific vehicle
+* *************************************** */
+async function getUpgradesByVehicleId(vehicleId) {
+  try {
+    const sql = `
+      SELECT u.* 
+      FROM upgrades u
+      JOIN vehicle_upgrades vu ON u.upgrade_id = vu.upgrade_id
+      WHERE vu.inv_id = $1 AND u.upgrade_available = true
+      ORDER BY u.upgrade_price
+    `;
+    const result = await pool.query(sql, [vehicleId]);
+    return result.rows;
+  } catch (error) {
+    console.error("Error getting upgrades by vehicle ID:", error);
+    return [];
+  }
+}
+
+/* ****************************************
+*  Add upgrade to user's cart
+* *************************************** */
+async function addUpgradeToCart(upgradeId, vehicleId, quantity, accountId) {
+  try {
+    const sql = `
+      INSERT INTO cart (account_id, inv_id, upgrade_id, quantity, added_date)
+      VALUES ($1, $2, $3, $4, NOW())
+      ON CONFLICT (account_id, inv_id, upgrade_id) 
+      DO UPDATE SET quantity = cart.quantity + EXCLUDED.quantity
+      RETURNING *
+    `;
+    const result = await pool.query(sql, [accountId, vehicleId, upgradeId, quantity]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error adding upgrade to cart:", error);
+    return null;
+  }
+}
+
+/* ****************************************
+*  Get cart items for a user
+* *************************************** */
+async function getCartItems(accountId) {
+  try {
+    const sql = `
+      SELECT 
+        c.cart_item_id,
+        c.quantity,
+        u.upgrade_name,
+        u.upgrade_description,
+        u.upgrade_price,
+        u.upgrade_image,
+        i.inv_make,
+        i.inv_model,
+        i.inv_year,
+        (u.upgrade_price * c.quantity) as item_total
+      FROM cart c
+      JOIN upgrades u ON c.upgrade_id = u.upgrade_id
+      JOIN inventory i ON c.inv_id = i.inv_id
+      WHERE c.account_id = $1
+      ORDER BY c.added_date DESC
+    `;
+    const result = await pool.query(sql, [accountId]);
+    return result.rows;
+  } catch (error) {
+    console.error("Error getting cart items:", error);
+    return [];
+  }
+}
+
+/* ****************************************
+*  Get cart count for badge indicator
+* *************************************** */
+async function getCartCount(accountId) {
+  try {
+    const sql = `
+      SELECT COUNT(*) as item_count, COALESCE(SUM(quantity), 0) as total_quantity
+      FROM cart 
+      WHERE account_id = $1
+    `;
+    const result = await pool.query(sql, [accountId]);
+    return result.rows[0].total_quantity;
+  } catch (error) {
+    console.error("Error getting cart count:", error);
+    return 0;
+  }
+}
+
+/* ****************************************
+*  Calculate cart total price
+* *************************************** */
+async function calculateCartTotal(accountId) {
+  try {
+    const sql = `
+      SELECT COALESCE(SUM(u.upgrade_price * c.quantity), 0) as total
+      FROM cart c
+      JOIN upgrades u ON c.upgrade_id = u.upgrade_id
+      WHERE c.account_id = $1
+    `;
+    const result = await pool.query(sql, [accountId]);
+    return parseFloat(result.rows[0].total);
+  } catch (error) {
+    console.error("Error calculating cart total:", error);
+    return 0;
+  }
+}
+
+/* ****************************************
+*  Remove item from cart
+* *************************************** */
+async function removeFromCart(cartItemId, accountId) {
+  try {
+    const sql = `
+      DELETE FROM cart 
+      WHERE cart_item_id = $1 AND account_id = $2
+      RETURNING *
+    `;
+    const result = await pool.query(sql, [cartItemId, accountId]);
+    return result.rows.length > 0;
+  } catch (error) {
+    console.error("Error removing from cart:", error);
+    return false;
+  }
+}
+
+/* ****************************************
+*  Update cart item quantity
+* *************************************** */
+async function updateCartQuantity(cartItemId, quantity, accountId) {
+  try {
+    if (quantity <= 0) {
+      // If quantity is 0 or negative, remove the item
+      return await removeFromCart(cartItemId, accountId);
+    }
+    
+    const sql = `
+      UPDATE cart 
+      SET quantity = $1 
+      WHERE cart_item_id = $2 AND account_id = $3
+      RETURNING *
+    `;
+    const result = await pool.query(sql, [quantity, cartItemId, accountId]);
+    return result.rows.length > 0;
+  } catch (error) {
+    console.error("Error updating cart quantity:", error);
+    return false;
+  }
+}
+
+/* ****************************************
+*  Get all available upgrades (for admin management)
+* *************************************** */
+async function getAllUpgrades() {
+  try {
+    const sql = `
+      SELECT * FROM upgrades 
+      WHERE upgrade_available = true 
+      ORDER BY upgrade_name
+    `;
+    const result = await pool.query(sql);
+    return result.rows;
+  } catch (error) {
+    console.error("Error getting all upgrades:", error);
+    return [];
+  }
+}
+
 module.exports = {
   getClassifications, 
   getInventoryByClassificationId, 
@@ -153,5 +321,13 @@ module.exports = {
   addClassification,
   addInventoryItem,
   updateInventory,
-  getAllInventory 
+  getAllInventory,
+  getUpgradesByVehicleId,
+  addUpgradeToCart,
+  getCartItems,
+  getCartCount,
+  calculateCartTotal,
+  removeFromCart,
+  updateCartQuantity,
+  getAllUpgrades
 };

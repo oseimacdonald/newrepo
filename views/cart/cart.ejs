@@ -1,0 +1,49 @@
+<div class="cart-container">
+    <h1>Shopping Cart</h1>
+    
+    <% if (cartItems && cartItems.length > 0) { %>
+        <div class="cart-items">
+            <% cartItems.forEach(function(item) { %>
+                <div class="cart-item" data-cart-item-id="<%= item.cart_item_id %>">
+                    <div class="item-image">
+                        <img src="<%= item.upgrade_image || '/images/upgrades/default-upgrade.jpg' %>" 
+                             alt="<%= item.upgrade_name %>" width="100" height="75">
+                    </div>
+                    <div class="item-details">
+                        <h3><%= item.upgrade_name %></h3>
+                        <p class="vehicle-info">For: <%= item.inv_year %> <%= item.inv_make %> <%= item.inv_model %></p>
+                        <p class="item-description"><%= item.upgrade_description %></p>
+                    </div>
+                    <div class="item-controls">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" data-cart-item-id="<%= item.cart_item_id %>">-</button>
+                            <span class="quantity"><%= item.quantity %></span>
+                            <button class="quantity-btn plus" data-cart-item-id="<%= item.cart_item_id %>">+</button>
+                        </div>
+                        <div class="item-price">
+                            <span class="price"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.upgrade_price) %></span>
+                            <span class="item-total">Total: <%= new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.item_total) %></span>
+                        </div>
+                        <button class="remove-btn" data-cart-item-id="<%= item.cart_item_id %>">Remove</button>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+        
+        <div class="cart-summary">
+            <div class="total-section">
+                <h3>Cart Total: <span id="cart-total"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalPrice) %></span></h3>
+            </div>
+            <div class="cart-actions">
+                <a href="/inv" class="continue-shopping-btn">Continue Shopping</a>
+                <a href="/cart/checkout" class="checkout-btn">Proceed to Checkout</a>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="empty-cart">
+            <h2>Your cart is empty</h2>
+            <p>Browse our vehicles and upgrades to find something you'll love!</p>
+            <a href="/inv" class="browse-vehicles-btn">Browse Vehicles</a>
+        </div>
+    <% } %>
+</div>

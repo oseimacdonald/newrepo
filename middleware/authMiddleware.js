@@ -7,8 +7,8 @@ const authMiddleware = {};
  * JWT Verification Middleware
  * ********************************* */
 authMiddleware.verifyJWT = async (req, res, next) => {
-    const token = req.cookies.jwt; // Note: using "jwt" cookie based on your login code
-    
+    const token = req.cookies.jwt; // Using "jwt" cookie based on your login code
+
     if (!token) {
         const nav = await utilities.getNav();
         return res.status(401).render("account/login", {
@@ -40,11 +40,13 @@ authMiddleware.verifyJWT = async (req, res, next) => {
     }
 };
 
+// Alias for verifyJWT to maintain backward compatibility or preferred naming
+authMiddleware.checkLogin = authMiddleware.verifyJWT;
+
 /* **********************************
  * Employee/Admin Authorization Middleware
  * ********************************* */
 authMiddleware.requireEmployeeOrAdmin = async (req, res, next) => {
-    // Check if user exists and has proper account type
     if (!req.user || (req.user.account_type !== 'Employee' && req.user.account_type !== 'Admin')) {
         const nav = await utilities.getNav();
         return res.status(403).render("account/login", {

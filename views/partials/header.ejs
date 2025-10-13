@@ -3,6 +3,12 @@
         <a href="/" title="Return to home page">Mac Motors</a>
     </span>
     <div id="tools">
+        <!-- Cart Icon -->
+        <a href="/cart" class="cart-link" title="View shopping cart">
+            <span class="cart-icon">🛒</span>
+            <span class="cart-count" id="header-cart-count">0</span>
+        </a>
+        
         <% if (locals.accountData) { %>
             <!-- Display when user is logged in -->
             <a title="Welcome message" href="/account">Welcome <%= locals.accountData.account_firstname || 'User' %></a>

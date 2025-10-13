@@ -42,6 +42,39 @@
             </a>
           </div>
 
+          <!-- Upgrade Options Section -->
+          <div class="upgrade-options">
+            <h3>Available Upgrades</h3>
+            <div class="quick-upgrades">
+              <div class="quick-upgrade-item">
+                <span>Flux Capacitor - $12,100</span>
+                <button class="quick-add-btn" data-upgrade-id="1" data-vehicle-id="<%= vehicleData.inv_id %>">
+                  Add
+                </button>
+              </div>
+              <div class="quick-upgrade-item">
+                <span>Flame Decals - $400</span>
+                <button class="quick-add-btn" data-upgrade-id="2" data-vehicle-id="<%= vehicleData.inv_id %>">
+                  Add
+                </button>
+              </div>
+              <div class="quick-upgrade-item">
+                <span>Stainless Hub Caps - $850</span>
+                <button class="quick-add-btn" data-upgrade-id="3" data-vehicle-id="<%= vehicleData.inv_id %>">
+                  Add
+                </button>
+              </div>
+            </div>
+            <div class="upgrade-actions">
+              <a href="/upgrades/<%= vehicleData.inv_id %>" class="view-all-upgrades-btn">
+                View All Upgrade Options
+              </a>
+              <a href="/cart" class="view-cart-btn">
+                View Cart (<span id="cart-count">0</span>)
+              </a>
+            </div>
+          </div>
+
           <div class="vehicle-description">
             <h2>Description</h2>
             <p><%= vehicleData.inv_description %></p>
@@ -53,4 +86,3 @@
 
   </div>
 </div>
-

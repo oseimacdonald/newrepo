@@ -1,6 +1,6 @@
 const express = require("express");
 const router = new express.Router();
-const invController = require("../controllers/invController");
+const invController = require("../controllers/invController")
 const utilities = require("../utilities");
 const classValidate = require("../utilities/classification-validation");
 const authMiddleware = require('../middleware/authMiddleware');
@@ -22,7 +22,11 @@ router.get("/type/:classificationId", utilities.handleErrors(invController.build
 // Route for a specific vehicle detail page (public)
 router.get('/detail/:vehicleId', utilities.handleErrors(invController.getVehicleDetail));
 
-// ==================== PROTECTED ROUTES ====================
+// ==================== UPGRADE & CART ROUTES ====================
+// Route to show upgrades for a specific vehicle (public)
+router.get("/upgrades/:vehicleId", utilities.handleErrors(invController.buildUpgradesView));
+
+// ==================== PROTECTED MANAGEMENT ROUTES ====================
 // Route for inventory management view (Employee/Admin only)
 router.get("/management", 
   authMiddleware.requireInventoryAccess, 

@@ -38,6 +38,41 @@ const inventoryRules = () => {
   ];
 };
 
+/* ******************************
+ * Upgrade Validation Rules
+ * ***************************** */
+const upgradeRules = () => {
+  return [
+    body("upgrade_id")
+      .isInt({ min: 1 })
+      .withMessage("Valid upgrade ID is required."),
+    body("vehicle_id")
+      .isInt({ min: 1 })
+      .withMessage("Valid vehicle ID is required."),
+    body("quantity")
+      .isInt({ min: 1, max: 10 })
+      .withMessage("Quantity must be between 1 and 10.")
+  ];
+};
+
+/* ******************************
+ * Cart Validation Rules
+ * ***************************** */
+const cartRules = () => {
+  return [
+    body("cart_item_id")
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage("Valid cart item ID is required."),
+    body("quantity")
+      .isInt({ min: 0, max: 10 })
+      .withMessage("Quantity must be between 0 and 10.")
+  ];
+};
+
+/* ******************************
+ * Check Inventory Data
+ * ***************************** */
 const checkInventoryData = async (req, res, next) => {
   console.log("checkInventoryData middleware hit");
   const errors = validationResult(req);
@@ -63,7 +98,7 @@ const checkInventoryData = async (req, res, next) => {
 };
 
 /* ******************************
- * Check data and return errors or continue to update
+ * Check Update Data
  * ***************************** */
 const checkUpdateData = async (req, res, next) => {
   console.log("checkUpdateData middleware hit");
@@ -108,4 +143,126 @@ const checkUpdateData = async (req, res, next) => {
   next();
 };
 
-module.exports = { inventoryRules, checkInventoryData, checkUpdateData };
+/* ******************************
+ * Check Upgrade Data
+ * ***************************** */
+const checkUpgradeData = async (req, res, next) => {
+  console.log("checkUpgradeData middleware hit");
+  const errors = validationResult(req);
+  
+  if (!errors.isEmpty()) {
+    // For AJAX requests, return JSON response
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array()
+      });
+    }
+    
+    // For regular requests, redirect with flash message
+    req.flash('error', 'Please check your upgrade selection and try again.');
+    return res.redirect('back');
+  }
+
+  next();
+};
+
+/* ******************************
+ * Check Cart Data
+ * ***************************** */
+const checkCartData = async (req, res, next) => {
+  console.log("checkCartData middleware hit");
+  const errors = validationResult(req);
+  
+  if (!errors.isEmpty()) {
+    // For AJAX requests, return JSON response
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array()
+      });
+    }
+    
+    // For regular requests, redirect with flash message
+    req.flash('error', 'Please check your cart item and try again.');
+    return res.redirect('/cart');
+  }
+
+  next();
+};
+
+/* ******************************
+ * Validate Upgrade ID Parameter
+ * ***************************** */
+const validateUpgradeId = async (req, res, next) => {
+  const upgradeId = parseInt(req.params.upgradeId || req.body.upgrade_id);
+  
+  if (!upgradeId || upgradeId < 1) {
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid upgrade ID'
+      });
+    }
+    
+    req.flash('error', 'Invalid upgrade selection.');
+    return res.redirect('back');
+  }
+  
+  next();
+};
+
+/* ******************************
+ * Validate Vehicle ID Parameter
+ * ***************************** */
+const validateVehicleId = async (req, res, next) => {
+  const vehicleId = parseInt(req.params.vehicleId || req.body.vehicle_id);
+  
+  if (!vehicleId || vehicleId < 1) {
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid vehicle ID'
+      });
+    }
+    
+    req.flash('error', 'Invalid vehicle selection.');
+    return res.redirect('back');
+  }
+  
+  next();
+};
+
+/* ******************************
+ * Validate Cart Item ID Parameter
+ * ***************************** */
+const validateCartItemId = async (req, res, next) => {
+  const cartItemId = parseInt(req.params.cart_item_id || req.body.cart_item_id);
+  
+  if (!cartItemId || cartItemId < 1) {
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid cart item ID'
+      });
+    }
+    
+    req.flash('error', 'Invalid cart item.');
+    return res.redirect('/cart');
+  }
+  
+  next();
+};
+
+module.exports = { 
+  inventoryRules, 
+  checkInventoryData, 
+  checkUpdateData,
+  upgradeRules,
+  cartRules,
+  checkUpgradeData,
+  checkCartData,
+  validateUpgradeId,
+  validateVehicleId,
+  validateCartItemId
+};

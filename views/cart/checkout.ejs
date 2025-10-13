@@ -1,0 +1,45 @@
+<div class="checkout-container">
+    <h1>Checkout</h1>
+    
+    <div class="checkout-content">
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            <% cartItems.forEach(function(item) { %>
+                <div class="checkout-item">
+                    <span class="item-name"><%= item.upgrade_name %></span>
+                    <span class="item-quantity">Qty: <%= item.quantity %></span>
+                    <span class="item-price"><%= new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.item_total) %></span>
+                </div>
+            <% }) %>
+            <div class="checkout-total">
+                <strong>Total: <%= new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalPrice) %></strong>
+            </div>
+        </div>
+        
+        <div class="checkout-form">
+            <h2>Customer Information</h2>
+            <form id="checkout-form">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea id="address" name="address" required></textarea>
+                </div>
+                <div class="checkout-actions">
+                    <a href="/cart" class="back-to-cart-btn">Back to Cart</a>
+                    <button type="submit" class="place-order-btn">Place Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
