@@ -37,10 +37,15 @@
           </ul>
 
           <div class="buy-now">
-            <a href="#" class="own-today-btn">
-              <img src="/images/site/own_today.png" alt="Own Today - Purchase your vehicle now" width="200" height="60">
-            </a>
+            <form action="/inv/add-to-cart" method="POST">
+              <input type="hidden" name="inv_id" value="<%= vehicleData.inv_id %>">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="own-today-btn">
+                <img src="/images/site/own_today.png" alt="Own Today - Purchase your vehicle now" width="200" height="60">
+              </button>
+            </form>
           </div>
+
 
           <!-- Upgrade Options Section -->
           <div class="upgrade-options">
@@ -86,3 +91,4 @@
 
   </div>
 </div>
+

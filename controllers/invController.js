@@ -4,7 +4,6 @@ const utilities = require("../utilities");
 
 const invCont = {};
 
-// ========== ADD THIS MISSING FUNCTION ==========
 /* ****************************************
 *  Build browse ALL vehicles view - handles "/inv" route
 * *************************************** */
@@ -396,85 +395,119 @@ invCont.buildUpgradesView = async function (req, res, next) {
 * *************************************** */
 invCont.addUpgradeToCart = async function (req, res, next) {
   try {
-    const { upgrade_id, vehicle_id, quantity } = req.body;
-    const errors = validationResult(req);
-    
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        success: false, 
-        errors: errors.array() 
+    console.log("🛒 Add Upgrade to Cart - Request received");
+    console.log("Request body:", req.body);
+    console.log("User:", req.user);
+
+    const rawVehicleId = req.body.vehicle_id || req.body.inv_id;
+    const upgrade_id = parseInt(req.body.upgrade_id, 10);
+    const vehicle_id = parseInt(rawVehicleId, 10);
+    const quantity = parseInt(req.body.quantity, 10) || 1;
+    const account_id = req.user?.account_id;
+
+    // Validate required fields
+    if (!upgrade_id || isNaN(upgrade_id) || !vehicle_id || isNaN(vehicle_id)) {
+      console.log("❌ Missing or invalid upgrade_id or vehicle_id");
+      return res.status(400).json({
+        success: false,
+        message: "Missing or invalid upgrade_id or vehicle_id"
       });
     }
-    
+
+    if (!account_id) {
+      console.log("❌ No account ID - user not logged in");
+      return res.status(401).json({
+        success: false,
+        message: "Please log in to add items to cart"
+      });
+    }
+
+    console.log(`🔧 Adding upgrade: ${upgrade_id} for vehicle: ${vehicle_id}, quantity: ${quantity}, account: ${account_id}`);
+
     const result = await invModel.addUpgradeToCart(
-      upgrade_id, 
-      vehicle_id, 
-      quantity, 
-      req.account?.account_id
+      upgrade_id,
+      vehicle_id,
+      quantity,
+      account_id
     );
-    
-    if (result) {
-      res.json({ 
-        success: true, 
+
+    console.log("Database result:", result);
+
+    if (result && result.rows && result.rows.length > 0) {
+      const cartCount = await invModel.getCartCount(account_id);
+      console.log("✅ Upgrade added successfully. Cart count:", cartCount);
+      res.json({
+        success: true,
         message: "Upgrade added to cart successfully",
-        cartCount: await invModel.getCartCount(req.account?.account_id)
+        cartCount: cartCount
       });
     } else {
-      res.status(500).json({ 
-        success: false, 
-        message: "Failed to add upgrade to cart" 
+      console.log("❌ Database returned no rows or false");
+      res.status(500).json({
+        success: false,
+        message: "Failed to add upgrade to cart - no database response"
       });
     }
   } catch (error) {
-    console.error("Error adding to cart:", error);
-    next(error);
+    console.error("💥 Error adding to cart:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error adding to cart: " + error.message
+    });
   }
 };
+
 
 /* ****************************************
 *  Add item to cart (for regular inventory items)
 * *************************************** */
 invCont.addToCart = async function (req, res, next) {
   try {
-    const { inv_id, quantity = 1 } = req.body;
+    const rawInvId = req.body.inv_id || req.body.vehicle_id;
+    const inv_id = parseInt(rawInvId, 10);
+    const quantity = parseInt(req.body.quantity, 10) || 1;
+
+    console.log("🧾 Request Body:", req.body);
+    console.log("✅ Parsed inv_id:", inv_id, "quantity:", quantity);
+
+    // Validate inv_id
+    if (!inv_id || isNaN(inv_id)) {
+      req.flash("error", "Invalid inventory item selected.");
+      return res.redirect("back");
+    }
+
     const errors = validationResult(req);
-    
     if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        success: false, 
-        errors: errors.array() 
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
       });
     }
-    
-    // Use account_id from authentication middleware
-    const account_id = req.account?.account_id;
-    
+
+    const account_id = req.user?.account_id;
+
     if (!account_id) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "Please log in to add items to cart" 
-      });
+      req.flash("error", "You must be logged in to add items to the cart.");
+      return res.redirect("/account/login");
     }
-    
+
     const result = await invModel.addToCart(account_id, inv_id, quantity);
-    
+
     if (result) {
-      res.json({ 
-        success: true, 
-        message: "Item added to cart successfully",
-        cartCount: await invModel.getCartCount(account_id)
-      });
+      req.flash("success", "Item added to cart successfully!");
     } else {
-      res.status(500).json({ 
-        success: false, 
-        message: "Failed to add item to cart" 
-      });
+      req.flash("error", "Failed to add item to cart.");
     }
+
+    return res.redirect("/cart");
+
   } catch (error) {
-    console.error("Error adding to cart:", error);
-    next(error);
+    console.error("❌ Error in addToCart:", error);
+    req.flash("error", "An unexpected error occurred. Please try again.");
+    return res.redirect("back");
   }
 };
+
 
 /* ****************************************
 *  Build shopping cart view
@@ -482,8 +515,7 @@ invCont.addToCart = async function (req, res, next) {
 invCont.buildCartView = async function (req, res, next) {
   try {
     const nav = await utilities.getNav();
-    // Use whatever account ID your auth middleware provides
-    const account_id = req.account?.account_id || req.user?.account_id;
+    const account_id = req.user?.account_id || req.user?.account_id;
     
     const cartItems = await invModel.getCartItems(account_id);
     const totalPrice = await invModel.calculateCartTotal(account_id);
@@ -504,58 +536,59 @@ invCont.buildCartView = async function (req, res, next) {
 /* ****************************************
 *  Remove item from cart
 * *************************************** */
-invCont.buildCheckoutView = async function (req, res, next) {
+invCont.removeFromCart = async function (req, res, next) {
   try {
-    const nav = await utilities.getNav()
-    res.render("cart/checkout", {
-      title: "Checkout",
-      nav,
-      message: null,
-      errors: null
-    })
-  } catch (error) {
-    next(error)
-  }
-}
-
-
-/* ****************************************
-*  Update cart item quantity
-* *************************************** */
-invCont.buildCheckoutView = async function (req, res, next) {
-  try {
-    const nav = await utilities.getNav();
-    const account_id = req.account?.account_id || req.user?.account_id;
-
-    const cartItems = await invModel.getCartItems(account_id);
-    const totalPrice = await invModel.calculateCartTotal(account_id);
-
-    if (!cartItems || cartItems.length === 0) {
-      req.flash("notice", "Your cart is empty");
-      return res.redirect("/cart");
+    const { cart_item_id } = req.params;
+    const account_id = req.user?.account_id || req.user?.account_id;
+    
+    const result = await invModel.removeFromCart(cart_item_id, account_id);
+    
+    if (result) {
+      req.flash("notice", "Item removed from cart");
+    } else {
+      req.flash("notice", "Failed to remove item from cart");
     }
-
-    res.render("./cart/checkout", {
-      title: "Checkout",
-      nav,
-      cartItems,
-      totalPrice,
-      errors: null,
-    });
+    res.redirect("/cart");
   } catch (error) {
-    console.error("Error building checkout view:", error);
+    console.error("Error removing from cart:", error);
     next(error);
   }
 };
 
+/* ****************************************
+*  Update cart item quantity
+* *************************************** */
+invCont.updateCartQuantity = async function (req, res, next) {
+  try {
+    const { cart_item_id, quantity } = req.body;
+    const account_id = req.user?.account_id || req.user?.account_id;
+    
+    const result = await invModel.updateCartQuantity(cart_item_id, quantity, account_id);
+    
+    if (result) {
+      res.json({ 
+        success: true, 
+        message: "Cart updated successfully"
+      });
+    } else {
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to update cart" 
+      });
+    }
+  } catch (error) {
+    console.error("Error updating cart quantity:", error);
+    next(error);
+  }
+};
 
 /* ****************************************
 *  Build checkout view
 * *************************************** */
-async function updateCartQuantity (req, res, next) {
+invCont.buildCheckoutView = async function (req, res, next) {
   try {
     const nav = await utilities.getNav();
-    const account_id = req.account?.account_id || req.user?.account_id;
+    const account_id = req.user?.account_id || req.user?.account_id;
     
     const cartItems = await invModel.getCartItems(account_id);
     const totalPrice = await invModel.calculateCartTotal(account_id);

@@ -15,7 +15,8 @@ const cartFunctions = {
                 upgrade_id: upgradeId,
                 vehicle_id: vehicleId,
                 quantity: quantity
-            })
+            }),
+            credentials: 'include'  // ← ADDED
         })
         .then(response => response.json())
         .then(data => {
@@ -42,7 +43,8 @@ const cartFunctions = {
             body: JSON.stringify({
                 cart_item_id: cartItemId,
                 quantity: quantity
-            })
+            }),
+            credentials: 'include'  // ← ADDED
         })
         .then(response => response.json())
         .then(data => {
@@ -61,7 +63,8 @@ const cartFunctions = {
     // Remove item from cart
     removeFromCart: function(cartItemId) {
         fetch(`/cart/remove/${cartItemId}`, {
-            method: 'POST'
+            method: 'POST',
+            credentials: 'include'  // ← ADDED
         })
         .then(response => {
             if (response.ok) {
@@ -196,7 +199,9 @@ classificationList?.addEventListener("change", function () {
  let classification_id = classificationList.value 
  console.log(`classification_id is: ${classification_id}`) 
  let classIdURL = "/inv/getInventory/"+classification_id 
- fetch(classIdURL) 
+ fetch(classIdURL, {
+    credentials: 'include'  // ← ADDED
+ }) 
  .then(function (response) { 
   if (response.ok) { 
    return response.json(); 

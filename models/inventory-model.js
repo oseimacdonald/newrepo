@@ -128,8 +128,6 @@ async function updateInventory(
   }
 }
 
-// Add this to your inventory-model.js
-
 /* ***************************
  *  Get ALL inventory items (not filtered by classification)
  * ************************** */
@@ -169,12 +167,12 @@ async function getUpgradesByVehicleId(vehicleId) {
 /* ****************************************
 *  Add upgrade to user's cart
 * *************************************** */
-async function addUpgradeToCart(upgradeId, vehicleId, quantity, accountId) {
+async function addUpgradeToCart(accountId, vehicleId, upgradeId, quantity) {
   try {
     const sql = `
       INSERT INTO cart (account_id, inv_id, upgrade_id, quantity, added_date)
       VALUES ($1, $2, $3, $4, NOW())
-      ON CONFLICT (account_id, inv_id, upgrade_id) 
+      ON CONFLICT (account_id, inv_id, upgrade_id)
       DO UPDATE SET quantity = cart.quantity + EXCLUDED.quantity
       RETURNING *
     `;
@@ -183,6 +181,37 @@ async function addUpgradeToCart(upgradeId, vehicleId, quantity, accountId) {
   } catch (error) {
     console.error("Error adding upgrade to cart:", error);
     return null;
+  }
+}
+
+/* ****************************************
+*  Add vehicle (no upgrade) to user's cart
+* *************************************** */
+async function addVehicleToCart(accountId, vehicleId, quantity) {
+  try {
+    const sql = `
+      INSERT INTO cart (account_id, inv_id, quantity, added_date)
+      VALUES ($1, $2, $3, NOW())
+      ON CONFLICT (account_id, inv_id, upgrade_id) WHERE upgrade_id IS NULL
+      DO UPDATE SET quantity = cart.quantity + EXCLUDED.quantity
+      RETURNING *
+    `;
+    const result = await pool.query(sql, [accountId, vehicleId, quantity]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error adding vehicle to cart:", error);
+    return null;
+  }
+}
+
+/* ****************************************
+*  Add item to cart (decides if upgrade or vehicle)
+* *************************************** */
+async function addToCart(accountId, vehicleId, quantity, upgradeId = null) {
+  if (upgradeId === null) {
+    return await addVehicleToCart(accountId, vehicleId, quantity);
+  } else {
+    return await addUpgradeToCart(accountId, vehicleId, upgradeId, quantity);
   }
 }
 
@@ -324,6 +353,7 @@ module.exports = {
   getAllInventory,
   getUpgradesByVehicleId,
   addUpgradeToCart,
+  addToCart,   // <== Exporting addToCart here
   getCartItems,
   getCartCount,
   calculateCartTotal,
