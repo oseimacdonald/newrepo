@@ -466,45 +466,63 @@ invCont.addToCart = async function (req, res, next) {
     const rawInvId = req.body.inv_id || req.body.vehicle_id;
     const inv_id = parseInt(rawInvId, 10);
     const quantity = parseInt(req.body.quantity, 10) || 1;
+    const upgrade_id = req.body.upgrade_id ? parseInt(req.body.upgrade_id, 10) : null;
 
     console.log("🧾 Request Body:", req.body);
-    console.log("✅ Parsed inv_id:", inv_id, "quantity:", quantity);
+    console.log("✅ Parsed values:", { account_id: req.user?.account_id, inv_id, quantity, upgrade_id });
 
-    // Validate inv_id
     if (!inv_id || isNaN(inv_id)) {
-      req.flash("error", "Invalid inventory item selected.");
-      return res.redirect("back");
-    }
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        errors: errors.array(),
+        message: "Invalid inventory item selected."
       });
     }
 
     const account_id = req.user?.account_id;
 
     if (!account_id) {
-      req.flash("error", "You must be logged in to add items to the cart.");
-      return res.redirect("/account/login");
+      return res.status(401).json({
+        success: false,
+        message: "You must be logged in to add items to the cart."
+      });
     }
 
-    const result = await invModel.addToCart(account_id, inv_id, quantity);
+    console.log("🔍 Calling invModel.addToCart with:", { account_id, inv_id, quantity, upgrade_id });
+    
+    const result = await invModel.addToCart(account_id, inv_id, quantity, upgrade_id);
 
-    if (result) {
-      req.flash("success", "Item added to cart successfully!");
+    console.log("✅ Model result:", result);
+
+    if (result && result.rows && result.rows.length > 0) {
+      const cartCount = await invModel.getCartCount(account_id);
+      console.log("🛒 Cart count after add:", cartCount);
+      return res.status(200).json({
+        success: true,
+        message: "Item added to cart successfully!",
+        cartCount
+      });
     } else {
-      req.flash("error", "Failed to add item to cart.");
+      console.log("❌ Model returned no rows");
+      return res.status(500).json({
+        success: false,
+        message: "Failed to add item to cart - no database response."
+      });
     }
-
-    return res.redirect("/cart");
 
   } catch (error) {
-    console.error("❌ Error in addToCart:", error);
-    req.flash("error", "An unexpected error occurred. Please try again.");
-    return res.redirect("back");
+    console.error("💥 CATCH BLOCK - Error in addToCart controller:", error);
+    console.error("💥 Full error object:", {
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+      detail: error.detail
+    });
+    return res.status(500).json({
+      success: false,
+      message: "An unexpected error occurred.",
+      error: error.message,
+      code: error.code
+    });
   }
 };
 

@@ -128,10 +128,10 @@ INSERT INTO public.inventory (
 
 -- Insert upgrades data
 INSERT INTO public.upgrades (upgrade_name, upgrade_description, upgrade_price, upgrade_image) VALUES
-  ('Flux Capacitor', 'Travel through time with our premium flux capacitor installation. Requires 1.21 gigawatts of power (not included).', 12100.00, '/images/upgrades/flux-cap.webp'),
-  ('Flame Decals', 'Add racing flame decals for that classic time-traveling look. High-quality vinyl that lasts for years.', 400.00, '/images/upgrades/flame.webp'),
-  ('Stainless Steel Hub Caps', 'Premium stainless steel hub caps specially designed to match the iconic look of classic vehicles.', 850.00, '/images/upgrades/hub-cap.webp'),
-  ('Time Traveler Package', 'Express your time traveling adventures with our special edition bumper stickers and decals.', 120.00, '/images/upgrades/bumper_sticker.webp'),
+  ('Flux Capacitor', 'Travel through time with our premium flux capacitor installation. Requires 1.21 gigawatts of power (not included).', 12100.00, '/images/upgrades/flux-cap.png'),
+  ('Flame Decals', 'Add racing flame decals for that classic time-traveling look. High-quality vinyl that lasts for years.', 400.00, '/images/upgrades/flame.jpg'),
+  ('Stainless Steel Hub Caps', 'Premium stainless steel hub caps specially designed to match the iconic look of classic vehicles.', 850.00, '/images/upgrades/hub-cap.jpg'),
+  ('Time Traveler Package', 'Express your time traveling adventures with our special edition bumper stickers and decals.', 120.00, '/images/upgrades/bumper_sticker.jpg'),
   ('Premium Sound System', 'Upgrade to our premium 10-speaker sound system with subwoofer and noise cancellation technology.', 1200.00, '/images/upgrades/sound-system.jpg'),
   ('Leather Interior', 'Luxury leather seats with heating and cooling functions for maximum comfort.', 2500.00, '/images/upgrades/leather-interior.jpg'),
   ('Performance Exhaust', 'High-performance exhaust system for improved sound and better engine efficiency.', 800.00, '/images/upgrades/exhaust.jpg'),

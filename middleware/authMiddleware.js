@@ -8,40 +8,52 @@ const authMiddleware = {};
  * ********************************* */
 authMiddleware.verifyJWT = async (req, res, next) => {
     const token = req.cookies.jwt;
-    console.log("🧪 Received JWT token:", token); // ← LOG received token
+    const isJsonRequest = req.headers.accept?.includes("application/json") || req.xhr;
+
+    console.log("🧪 Received JWT token:", token);
 
     if (!token) {
-        console.log("❌ No JWT token found in cookies"); // ← LOG missing token
-        const nav = await utilities.getNav();
-        return res.status(401).render("account/login", {
-            title: "Login",
-            nav,
-            errors: null,
-            account_email: '',
-            message: "Please log in to access this page."
-        });
+        console.log("❌ No JWT token found in cookies");
+        if (isJsonRequest) {
+            return res.status(401).json({ success: false, message: "Unauthorized. Please log in." });
+        } else {
+            const nav = await utilities.getNav();
+            return res.status(401).render("account/login", {
+                title: "Login",
+                nav,
+                errors: null,
+                account_email: '',
+                message: "Please log in to access this page."
+            });
+        }
     }
 
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        console.log("✅ JWT decoded successfully:", decoded); // ← LOG decoded token
+        console.log("✅ JWT decoded successfully:", decoded);
 
         req.user = decoded;
-        res.locals.user = decoded; // Make user available to views
+        res.locals.user = decoded;
         next();
     } catch (error) {
-        console.error("❌ JWT verification failed:", error.message); // ← LOG error details
-        const nav = await utilities.getNav();
+        console.error("❌ JWT verification failed:", error.message);
         res.clearCookie("jwt");
-        return res.status(401).render("account/login", {
-            title: "Login",
-            nav,
-            errors: null,
-            account_email: '',
-            message: "Session expired. Please log in again."
-        });
+
+        if (isJsonRequest) {
+            return res.status(401).json({ success: false, message: "Session expired. Please log in again." });
+        } else {
+            const nav = await utilities.getNav();
+            return res.status(401).render("account/login", {
+                title: "Login",
+                nav,
+                errors: null,
+                account_email: '',
+                message: "Session expired. Please log in again."
+            });
+        }
     }
 };
+
 
 // Alias for checkLogin if used elsewhere
 authMiddleware.checkLogin = authMiddleware.verifyJWT;

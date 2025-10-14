@@ -167,6 +167,9 @@ async function getUpgradesByVehicleId(vehicleId) {
 /* ****************************************
 *  Add upgrade to user's cart
 * *************************************** */
+/* ****************************************
+*  Add upgrade to user's cart
+* *************************************** */
 async function addUpgradeToCart(accountId, vehicleId, upgradeId, quantity) {
   try {
     const sql = `
@@ -176,23 +179,32 @@ async function addUpgradeToCart(accountId, vehicleId, upgradeId, quantity) {
       DO UPDATE SET quantity = cart.quantity + EXCLUDED.quantity
       RETURNING *
     `;
+    console.log('🔍 Executing upgrade cart SQL:', sql);
+    console.log('🔍 With parameters:', [accountId, vehicleId, upgradeId, quantity]);
+    
     const result = await pool.query(sql, [accountId, vehicleId, upgradeId, quantity]);
-    return result.rows[0];
+    console.log('✅ Upgrade cart result:', result.rows[0]);
+    return result;
   } catch (error) {
-    console.error("Error adding upgrade to cart:", error);
-    return null;
+    console.error("💥 Database error in addUpgradeToCart:", error);
+    console.error("💥 Error details:", {
+      message: error.message,
+      code: error.code,
+      detail: error.detail,
+      constraint: error.constraint
+    });
+    throw error;
   }
 }
-
 /* ****************************************
 *  Add vehicle (no upgrade) to user's cart
 * *************************************** */
 async function addVehicleToCart(accountId, vehicleId, quantity) {
   try {
     const sql = `
-      INSERT INTO cart (account_id, inv_id, quantity, added_date)
-      VALUES ($1, $2, $3, NOW())
-      ON CONFLICT (account_id, inv_id, upgrade_id) WHERE upgrade_id IS NULL
+      INSERT INTO cart (account_id, inv_id, upgrade_id, quantity, added_date)
+      VALUES ($1, $2, NULL, $3, NOW())
+      ON CONFLICT (account_id, inv_id, upgrade_id) 
       DO UPDATE SET quantity = cart.quantity + EXCLUDED.quantity
       RETURNING *
     `;
@@ -224,6 +236,7 @@ async function getCartItems(accountId) {
       SELECT 
         c.cart_item_id,
         c.quantity,
+        c.upgrade_id,
         u.upgrade_name,
         u.upgrade_description,
         u.upgrade_price,
@@ -231,9 +244,15 @@ async function getCartItems(accountId) {
         i.inv_make,
         i.inv_model,
         i.inv_year,
-        (u.upgrade_price * c.quantity) as item_total
+        i.inv_description AS vehicle_description,
+        i.inv_price AS vehicle_price,
+        i.inv_image AS vehicle_image,
+        CASE
+          WHEN u.upgrade_id IS NOT NULL THEN u.upgrade_price * c.quantity
+          ELSE i.inv_price * c.quantity
+        END AS item_total
       FROM cart c
-      JOIN upgrades u ON c.upgrade_id = u.upgrade_id
+      LEFT JOIN upgrades u ON c.upgrade_id = u.upgrade_id
       JOIN inventory i ON c.inv_id = i.inv_id
       WHERE c.account_id = $1
       ORDER BY c.added_date DESC
@@ -270,9 +289,15 @@ async function getCartCount(accountId) {
 async function calculateCartTotal(accountId) {
   try {
     const sql = `
-      SELECT COALESCE(SUM(u.upgrade_price * c.quantity), 0) as total
+      SELECT COALESCE(SUM(
+        CASE
+          WHEN u.upgrade_id IS NOT NULL THEN u.upgrade_price * c.quantity
+          ELSE i.inv_price * c.quantity
+        END
+      ), 0) AS total
       FROM cart c
-      JOIN upgrades u ON c.upgrade_id = u.upgrade_id
+      LEFT JOIN upgrades u ON c.upgrade_id = u.upgrade_id
+      JOIN inventory i ON c.inv_id = i.inv_id
       WHERE c.account_id = $1
     `;
     const result = await pool.query(sql, [accountId]);
@@ -282,6 +307,7 @@ async function calculateCartTotal(accountId) {
     return 0;
   }
 }
+
 
 /* ****************************************
 *  Remove item from cart
