@@ -157,4 +157,54 @@ Util.checkLogin = (req, res, next) => {
   }
 }
 
+/* ****************************************
+ *  Cart Authentication Helper
+ * ************************************ */
+Util.checkCartAuth = (req, res, next) => {
+  const token = req.cookies.jwt;
+  
+  if (!token) {
+    return res.status(401).json({ 
+      success: false, 
+      message: "Please log in to add items to your cart.",
+      requiresLogin: true 
+    });
+  }
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, accountData) => {
+    if (err) {
+      res.clearCookie("jwt");
+      return res.status(401).json({ 
+        success: false, 
+        message: "Session expired. Please log in again.",
+        requiresLogin: true 
+      });
+    }
+    
+    req.user = accountData;
+    res.locals.accountData = accountData;
+    next();
+  });
+};
+
+/* ****************************************
+ *  Get Auth State for UI
+ * ************************************ */
+Util.getAuthState = (req) => {
+  const token = req.cookies.jwt;
+  if (!token) {
+    return { isAuthenticated: false, user: null };
+  }
+
+  try {
+    const accountData = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    return { 
+      isAuthenticated: true, 
+      user: accountData 
+    };
+  } catch (err) {
+    return { isAuthenticated: false, user: null };
+  }
+};
+
 module.exports = Util

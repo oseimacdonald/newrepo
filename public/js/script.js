@@ -4,7 +4,7 @@
 
 // Global cart functions
 const cartFunctions = {
-    // Add item to cart via AJAX
+    // Add item to cart via AJAX with proper error handling
     addToCart: function(upgradeId, vehicleId, quantity = 1) {
         fetch('/cart/add', {
             method: 'POST',
@@ -16,22 +16,138 @@ const cartFunctions = {
                 vehicle_id: vehicleId,
                 quantity: quantity
             }),
-            credentials: 'include'  // ← ADDED
+            credentials: 'include'
         })
-        .then(response => response.json())
+        .then(response => {
+            // First, check the response status
+            if (response.status === 401) {
+                // Try to parse as JSON, but have a fallback
+                return response.json().then(data => {
+                    throw new Error(data.message || 'Please log in to add items to cart');
+                }).catch(() => {
+                    // If JSON parsing fails, throw with generic auth message
+                    throw new Error('Please log in to add items to cart');
+                });
+            }
+            
+            if (response.status === 500) {
+                throw new Error('Server error. Please try again later.');
+            }
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            // If we get here, response is OK, parse as JSON
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 this.showCartNotification(data.message);
                 this.updateCartCount(data.cartCount);
             } else {
+                // Handle business logic errors (not HTTP errors)
                 this.showCartError(data.errors || data.message);
             }
         })
         .catch(error => {
             console.error('Error adding to cart:', error);
-            this.showCartError('Failed to add item to cart. Please try again.');
+            
+            // Show specific error messages based on the error
+            if (error.message.includes('log in') || error.message.includes('auth') || error.message.includes('401')) {
+                this.showCartError(error.message);
+                // Optionally show login prompt for auth errors
+               // setTimeout(() => {
+                //    if (confirm('Would you like to log in now?')) {
+                //        window.location.href = '/account/login?redirect=' + encodeURIComponent(window.location.pathname);
+                //    }
+            //    }, 1000);
+            } else {
+                this.showCartError('Failed to add item to cart. Please try again.');
+            }
         });
     },
+
+    // Enhanced version with even better error handling
+    addToCartEnhanced: function(upgradeId, vehicleId, quantity = 1) {
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                upgrade_id: upgradeId,
+                vehicle_id: vehicleId,
+                quantity: quantity
+            }),
+            credentials: 'include'
+        })
+        .then(async (response) => {
+            let data;
+            
+            try {
+                data = await response.json();
+            } catch (e) {
+                // If JSON parsing fails, create a simple data object
+                data = { success: false, message: 'Invalid server response' };
+            }
+            
+            // Handle different HTTP status codes
+            if (response.status === 401) {
+                throw new Error(data.message || 'Please log in to access this feature');
+            }
+            
+            if (response.status === 403) {
+                throw new Error(data.message || 'You do not have permission to perform this action');
+            }
+            
+            if (response.status >= 500) {
+                throw new Error(data.message || 'Server error. Please try again later.');
+            }
+            
+            if (!response.ok) {
+                throw new Error(data.message || `Request failed with status ${response.status}`);
+            }
+            
+            return data;
+        })
+        .then(data => {
+            if (data.success) {
+                this.showCartNotification(data.message);
+                this.updateCartCount(data.cartCount);
+            } else {
+                this.showCartError(data.errors || data.message || 'Failed to add item to cart');
+            }
+        })
+        .catch(error => {
+            console.error('Cart error:', error);
+            
+            // Categorize errors and show appropriate messages
+            const errorMessage = error.message.toLowerCase();
+            
+            if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+                this.showCartError('Network error. Please check your connection and try again.');
+            } else if (errorMessage.includes('log in') || errorMessage.includes('auth') || errorMessage.includes('401')) {
+                this.showCartError(error.message);
+                this.showLoginPrompt(error.message);
+            } else if (errorMessage.includes('permission') || errorMessage.includes('403')) {
+                this.showCartError(error.message);
+            } else {
+                this.showCartError('Failed to add item to cart. Please try again.');
+            }
+        });
+    },
+
+    // Show login prompt
+    showLoginPrompt: function(message = 'You need to be logged in to continue.') {
+        setTimeout(() => {
+            if (confirm(message + ' Would you like to log in now?')) {
+                const currentPath = window.location.pathname + window.location.search;
+                window.location.href = `/account/login?redirect=${encodeURIComponent(currentPath)}`;
+            }
+        }, 500);
+    },
+
 
     // Update cart item quantity
     updateCartQuantity: function(cartItemId, quantity) {

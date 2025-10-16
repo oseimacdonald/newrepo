@@ -167,9 +167,6 @@ async function getUpgradesByVehicleId(vehicleId) {
 /* ****************************************
 *  Add upgrade to user's cart
 * *************************************** */
-/* ****************************************
-*  Add upgrade to user's cart
-* *************************************** */
 async function addUpgradeToCart(accountId, vehicleId, upgradeId, quantity) {
   try {
     const sql = `
